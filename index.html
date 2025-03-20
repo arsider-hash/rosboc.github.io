@@ -4,206 +4,118 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ROSBOC AUTOMATON</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        /* Reset */
-        body, html {
+        html, body {
             margin: 0;
             padding: 0;
-            background-color: #ffffff;
-            color: #000000;
-            font-family: 'UnifrakturMaguntia', cursive;
-            overflow-x: hidden;
-        }
-
-        /* Container principale */
-        .container {
-            padding: 50px;
-            text-align: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Titolo con font black metal */
-        .title {
-            font-size: 6rem;
-            font-family: 'UnifrakturMaguntia', cursive;
-            color: #000000;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            text-shadow: 2px 2px 0 #ff0000, 4px 4px 0 #000000;
-            margin-bottom: 20px;
-            animation: flicker 1.5s infinite alternate;
-        }
-
-        @keyframes flicker {
-            0% { opacity: 0.8; }
-            50% { opacity: 1; }
-            100% { opacity: 0.8; }
-        }
-
-        /* Sottotitolo con font outline */
-        .subtitle {
-            font-size: 2.5rem;
-            font-family: 'Bebas Neue', sans-serif;
-            color: transparent;
-            -webkit-text-stroke: 2px #000000;
-            letter-spacing: 3px;
-            margin-top: 10px;
-            animation: float 3s infinite ease-in-out;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0); }
-        }
-
-        /* Immagine con effetto distorsione */
-        .image-container {
-            margin: 40px auto;
-            width: 300px;
-            height: 300px;
-            border: 5px solid #000000;
-            border-radius: 50%;
-            overflow: hidden;
-            position: relative;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
-            transition: transform 0.5s ease-in-out;
-        }
-
-        .rosboc-image {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease-in-out, filter 0.5s ease-in-out;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            background: #ffffff;
+            text-align: center;
         }
 
-        .image-container:hover .rosboc-image {
-            transform: rotate(360deg) scale(1.2);
-            filter: grayscale(100%) contrast(200%);
+        .title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 4em;
+            color: black;
+            text-transform: uppercase;
+            margin: 50px 0 20px 0;
+            animation: loop 2s linear infinite;
         }
 
-        /* Testo interattivo */
-        .interactive-text {
-            font-size: 1.5rem;
-            font-family: 'Bebas Neue', sans-serif;
-            color: #000000;
-            margin-top: 30px;
+        @keyframes loop {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .subtitle {
+            font-family: monospace; /* Utilizza un font pixel strano */
+            font-size: 1.5em;
+            margin-bottom: 30px;
+        }
+
+        .image-container {
+            margin: 40px 0;
             cursor: pointer;
-            text-decoration: none;
-            transition: color 0.3s ease, transform 0.3s ease;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
         }
 
-        .interactive-text:hover {
-            color: #ff0000;
-            transform: scale(1.1);
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            transition: none;
         }
 
-        /* Sezione funzioni inventate */
-        .features {
-            margin-top: 50px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .feature {
-            background: #f5f5f5;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .feature:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .feature h3 {
-            font-size: 1.8rem;
-            font-family: 'UnifrakturMaguntia', cursive;
-            color: #000000;
-            margin-bottom: 10px;
-            text-shadow: 1px 1px 0 #ff0000;
-        }
-
-        .feature p {
-            font-size: 1rem;
-            font-family: 'Bebas Neue', sans-serif;
-            color: #555555;
-        }
-
-        /* Footer */
-        footer {
-            margin-top: 50px;
-            font-size: 0.9rem;
-            font-family: 'Bebas Neue', sans-serif;
-            color: #777777;
-        }
-
-        footer a {
-            color: #000000;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        footer a:hover {
-            color: #ff0000;
-        }
-
-        /* Ottimizzazione mobile */
-        @media (max-width: 768px) {
-            .title {
-                font-size: 4rem;
-            }
-
-            .subtitle {
-                font-size: 2rem;
-            }
-
-            .image-container {
-                width: 200px;
-                height: 200px;
-            }
-
-            .interactive-text {
-                font-size: 1.2rem;
-            }
-
-            .features {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Nascondi il player SoundCloud */
-        #soundcloud-player {
-            display: none;
+        #soundcloudWidget {
+            position: absolute;
+            top: -1000px;
+            left: -1000px;
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Bebas+Neue&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1 class="title">ROSBOC AUTOMATON</h1>
-        <h2 class="subtitle">emotions to midi</h2>
-        <div class="image-container">
-            <img src="https://www.gedistatic.it/content/gedi/img/huffingtonpost/2016/02/24/203613886-696fb9a9-0661-439f-a06d-a9b39b7254f6.jpeg?webp" alt="ROSBOC Image" class="rosboc-image">
-        </div>
-        <p class="interactive-text" onclick="window.open('https://docs.google.com/document/d/11tJpl_25A9e0FIx2nX-t4q-7qu4K2IfaUH8wHWXjzWE/edit?tab=t.0', '_blank')">
-            La musica generata dipende dalla tua interazione. Attraverso l’interpretabilità del protocollo MIDI, ROSBOC è in grado di tracciare porosità che lavorano su uno slittamento del senso percettivo generando un contatto tra TE e i DATI, tra il tuo profilo acustico esistenziale e la acquisizione reale del virtuale.
-        </p>
+    <h1 class="title">ROSBOC AUTOMATON</h1>
+    <h2 class="subtitle">emotions to midi</h2>
 
-        <!-- Sezione funzioni inventate -->
-        <div class="features">
-            <div class="feature">
-                <h3>Neuro-Sonificazione</h3>
-                <p>ROSBOC trasforma le tue onde cerebrali in suoni MIDI in tempo reale. Usa un'interfaccia neurale per creare musica direttamente dai tuoi pensieri.</p>
-            </div>
-            <div class="feature">
-                <h3>Realtà Aumentata Acustica</h3>
-                <p>Con ROSBOC, puoi "vedere" i suoni nello spazio 3D. Ogni nota MIDI genera un ologramma sonoro interattivo.</p>
-            </div>
-            <div class="feature">
-                <h3>AI Emotiva</h3>
-                <p>L'intelligenza artificiale di ROSBOC analizza le
+    <div class="content">
+        <div class="image-container" id="triggerAudio">
+            <img src="https://www.gedistatic.it/content/gedi/img/huffingtonpost/2016/02/24/203613886-696fb9a9-0661-439f-a06d-a9b39b7254f6.jpeg?webp" alt="ROSBOC Image">
+        </div>
+    </div>
+
+    <iframe id="soundcloudWidget" width="1" height="1" scrolling="no" frameborder="no" allow="autoplay"
+        src="https://soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-low-minister-edition"></iframe>
+
+    <script>
+        const image = document.querySelector('.image-container img');
+        const soundcloudWidget = document.getElementById('soundcloudWidget');
+        let isPlaying = false;
+        let rotationInterval;
+
+        function playAudio() {
+            if (!isPlaying) {
+                soundcloudWidget.src = soundcloudWidget.src;
+                isPlaying = true;
+                startRotation();
+            }
+        }
+
+        function stopAudio() {
+            isPlaying = false;
+            stopRotation();
+            image.style.filter = 'none';
+            image.style.transform = 'none';
+        }
+
+        function startRotation() {
+            rotationInterval = setInterval(() => {
+                const randomRotation = Math.random() * 1440 - 720;
+                const randomScaleX = Math.random() * 2 - 0.5;
+                const randomScaleY = Math.random() * 2 - 0.5;
+                const randomSkewX = Math.random() * 60 - 30;
+                const randomSkewY = Math.random() * 60 - 30;
+                const randomBlur = Math.random() * 10 + 'px';
+                const randomBrightness = Math.random() * 1.5;
+                const randomHueRotate = Math.random() * 360 + 'deg';
+                image.style.transform = `rotate(${randomRotation}deg) scale(${randomScaleX}, ${randomScaleY}) skew(${randomSkewX}deg, ${randomSkewY}deg)`;
+                image.style.filter = `blur(${randomBlur}) brightness(${randomBrightness}) hue-rotate(${randomHueRotate})`;
+            }, 50);
+        }
+
+        function stopRotation() {
+            clearInterval(rotationInterval);
+        }
+
+        document.getElementById('triggerAudio').addEventListener('mouseenter', playAudio);
+        document.getElementById('triggerAudio').addEventListener('mouseleave', stopAudio);
+
+        document.getElementById('triggerAudio').addEventListener('touchstart', playAudio, { passive: true });
+        document.getElementById('triggerAudio').addEventListener('touchend', stopAudio, { passive: true });
+    </script>
+</body>
+</html>
