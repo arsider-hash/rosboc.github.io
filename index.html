@@ -45,7 +45,7 @@
         .image-container img {
             max-width: 100%;
             height: auto;
-            transition: transform 0.1s ease-out;
+            transition: transform 0.2s ease;
         }
 
         .content {
@@ -70,14 +70,17 @@
         <div class="image-container" id="triggerAudio">
             <img id="image" src="https://www.repstatic.it/content/localirep/img/rep-torino/2018/01/09/173945946-93f90b9e-3303-445e-8892-b0f097c73e8f.jpg" alt="Sistema ROSBOC">
         </div>
-        <p class="description" id="description">La musica generata dipende dalla tua interazione. Attraverso l’interpretabilità del protocollo MIDI, ROSBOC è in grado di tracciare porosità che lavorano su uno slittamento del senso percettivo generando un contatto tra TE e i DATI, tra il tuo profilo acustico esistenziale e la acquisizione reale del virtuale.</p>
+        <p class="description" id="description">
+            La musica generata dipende dalla tua interazione. Attraverso l’interpretabilità del protocollo MIDI, ROSBOC è in grado di tracciare porosità che lavorano su uno slittamento del senso percettivo generando un contatto tra TE e i DATI, tra il tuo profilo acustico esistenziale e la acquisizione reale del virtuale.
+        </p>
     </div>
     <audio id="audio" crossorigin="anonymous"></audio>
     
     <script>
         let player;
         let audioStarted = false;
-        const image = document.getElementById("image");
+        let image = document.getElementById('image');
+        let description = document.getElementById('description');
 
         function initAudio() {
             player = new Tone.Player({
@@ -104,23 +107,22 @@
             const clientY = event.touches ? event.touches[0].clientY : event.clientY;
             const x = (clientX - rect.left) / rect.width;
             const y = (clientY - rect.top) / rect.height;
+
             startAudio(x, y);
-            applyImageEffects(x, y);
+
+            // Apply image transformations
+            image.style.transform = `scale(${1 + y}, ${1 + x})`;
         }
 
-        function applyImageEffects(x, y) {
-            const scaleX = 1 + (x * 0.2);
-            const scaleY = 1 + (y * 0.2);
-            image.style.transform = `scale(${scaleX}, ${scaleY}) rotate(${x * 20 - 10}deg)`;
+        function handleDescriptionInteraction(event) {
+            window.open('https://docs.google.com/document/d/11tJpl_25A9e0FIx2nX-t4q-7qu4K2IfaUH8wHWXjzWE/edit?tab=t.0', '_blank');
         }
 
         document.getElementById("triggerAudio").addEventListener("mousemove", handleInteraction);
+        document.getElementById("triggerAudio").addEventListener("touchmove", handleInteraction);
         document.getElementById("triggerAudio").addEventListener("click", handleInteraction);
-
-        document.getElementById("description").addEventListener("mouseover", function() {
-            window.open("https://docs.google.com/document/d/11tJpl_25A9e0FIx2nX-t4q-7qu4K2IfaUH8wHWXjzWE/edit?tab=t.0", "_blank");
-        });
-        
+        description.addEventListener("mouseover", handleDescriptionInteraction);
+        description.addEventListener("touchstart", handleDescriptionInteraction);
         window.onload = initAudio;
     </script>
 </body>
