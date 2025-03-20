@@ -175,6 +175,11 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Nascondi il player SoundCloud */
+        #soundcloud-player {
+            display: none;
+        }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Bebas+Neue&display=swap" rel="stylesheet">
 </head>
@@ -201,25 +206,4 @@
             </div>
             <div class="feature">
                 <h3>AI Emotiva</h3>
-                <p>L'intelligenza artificiale di ROSBOC analizza le tue emozioni e le traduce in armonie complesse, creando una sinfonia unica per ogni stato d'animo.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer>
-        <p>ROSBOC AUTOMATON &copy; 2023 | <a href="#" target="_blank">Privacy Policy</a></p>
-    </footer>
-
-    <!-- Musica SoundCloud in background -->
-    <iframe id="soundcloud-player" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1799362339&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false" style="display: none;"></iframe>
-
-    <script>
-        // Riproduci automaticamente la musica di SoundCloud
-        window.onload = function() {
-            const iframe = document.getElementById('soundcloud-player');
-            iframe.src = "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1799362339&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false";
-        };
-    </script>
-</body>
-</html>
+                <p>L'intelligenza artificiale di ROSBOC analizza le
