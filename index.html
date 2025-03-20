@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARSIDER | ROSBOC</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <title>ROSBOC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         html, body {
             margin: 0;
@@ -13,38 +13,16 @@
             min-height: 100vh;
             overflow-x: hidden;
             overflow-y: auto;
-            text-align: center;
             background: #ffffff;
-        }
-
-        .arsider-brand {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            font-size: 12px;
-            color: #666;
+            text-align: center;
         }
 
         .title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 4em;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 6em;
             color: black;
-            cursor: pointer;
+            text-transform: uppercase;
             margin: 50px 0;
-        }
-
-        .image-container {
-            margin: 40px 0;
-            cursor: pointer;
-            display: inline-block;
-            position: relative;
-            touch-action: none;
-        }
-
-        .image-container img {
-            max-width: 100%;
-            height: auto;
-            transition: transform 0.2s ease, filter 0.2s ease, opacity 0.5s ease;
         }
 
         .content {
@@ -54,118 +32,58 @@
             color: #444;
         }
 
+        .image-container {
+            margin: 40px 0;
+            cursor: pointer;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .image-container:hover img {
+            transform: scale(1.1) rotate(2deg);
+        }
+
         .description {
-            font-size: 1.5em;
+            font-size: 20px;
             font-weight: bold;
             cursor: pointer;
             margin-top: 20px;
         }
 
-        .soundcloud-player {
-            display: none; /* Nascondi il player di SoundCloud */
+        #soundcloudWidget {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="arsider-brand">Progetto del gruppo ARSIDER</div>
     <h1 class="title">ROSBOC</h1>
+
     <div class="content">
         <div class="image-container" id="triggerAudio">
-            <img id="image" src="https://www.repstatic.it/content/localirep/img/rep-torino/2018/01/09/173945946-93f90b9e-3303-445e-8892-b0f097c73e8f.jpg" alt="Sistema ROSBOC">
+            <img src="https://www.repstatic.it/content/localirep/img/rep-torino/2018/01/09/173945946-93f90b9e-3303-445e-8892-b0f097c73e8f.jpg" alt="Sistema ROSBOC">
         </div>
-        <p class="description" id="description" onclick="window.open('https://docs.google.com/document/d/11tJpl_25A9e0FIx2nX-t4q-7qu4K2IfaUH8wHWXjzWE/edit?tab=t.0', '_blank')">
-            La musica generata dipende dalla tua interazione. Attraverso l’interpretabilità del protocollo MIDI, ROSBOC è in grado di tracciare porosità che lavorano su uno slittamento del senso percettivo generando un contatto tra TE e i DATI, tra il tuo profilo acustico esistenziale e la acquisizione reale del virtuale.
+
+        <p class="description" onclick="window.open('https://docs.google.com/document/d/11tJpl_25A9e0FIx2nX-t4q-7qu4K2IfaUH8wHWXjzWE/edit?usp=sharing', '_blank')">
+           La musica generata dipende dalla tua interazione. Attraverso l’interpretabilità del protocollo MIDI, ROSBOC è in grado di tracciare porosità che lavorano su uno slittamento del senso percettivo generando un contatto tra TE e i DATI, tra il tuo profilo acustico esistenziale e la acquisizione reale del virtuale.
         </p>
     </div>
 
-    <!-- Widget SoundCloud -->
-    <iframe id="soundcloudWidget" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1776684379&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe>
+    <!-- Hidden SoundCloud Player -->
+    <iframe id="soundcloudWidget" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay"
+        src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-low-minister-edition&auto_play=true"></iframe>
 
     <script>
-        let image = document.getElementById('image');
-        let soundcloudWidget = document.getElementById('soundcloudWidget');
-        let widget;
-        let startTime = 0;
-        let isPlaying = false;
-
-        // Inizializza il widget SoundCloud
-        function initSoundCloud() {
-            widget = SC.Widget(soundcloudWidget);
-            widget.bind(SC.Widget.Events.READY, () => {
-                console.log("SoundCloud widget pronto!");
-            });
-        }
-
-        // Avvia l'audio
-        function startAudio() {
-            if (!isPlaying) {
-                widget.play();
-                isPlaying = true;
-                startTime = Date.now();
-            }
-        }
-
-        // Gestisce l'interazione con l'immagine
-        function handleInteraction(event) {
-            const rect = event.currentTarget.getBoundingClientRect();
-            const clientX = event.touches ? event.touches[0].clientX : event.clientX;
-            const clientY = event.touches ? event.touches[0].clientY : event.clientY;
-            const x = (clientX - rect.left) / rect.width;
-            const y = (clientY - rect.top) / rect.height;
-
-            // Warping estremo dell'immagine
-            const skewX = (x - 0.5) * 50; // Skew orizzontale
-            const skewY = (y - 0.5) * 50; // Skew verticale
-            const scaleX = 1 + Math.abs(x - 0.5) * 2; // Scale orizzontale
-            const scaleY = 1 + Math.abs(y - 0.5) * 2; // Scale verticale
-
-            image.style.transform = `skew(${skewX}deg, ${skewY}deg) scale(${scaleX}, ${scaleY})`;
-            image.style.filter = `blur(${Math.abs(x - 0.5) * 10}px) brightness(${1 + y})`;
-
-            // Avvia l'audio al passaggio del mouse (solo su PC)
-            if (event.type === "mousemove") {
-                startAudio();
-            }
-        }
-
-        // Ripristina l'immagine quando il mouse/tocco esce
-        function resetImage() {
-            image.style.transform = "none";
-            image.style.filter = "blur(5px)"; // Foto torna normale ma blurrata
-        }
-
-        // Effetto di melt progressivo
-        function applyMeltEffect() {
-            const elapsedTime = (Date.now() - startTime) / 1000; // Tempo in secondi
-            if (elapsedTime >= 20) {
-                image.style.opacity = "0";
-                image.style.transform = "scale(0.5) rotate(180deg)";
-                image.style.filter = "blur(20px)";
-            } else if (elapsedTime >= 10) {
-                const progress = (elapsedTime - 10) / 10; // Progresso tra 10 e 20 secondi
-                image.style.opacity = `${1 - progress}`;
-                image.style.transform = `scale(${1 - progress * 0.5}) rotate(${progress * 180}deg)`;
-                image.style.filter = `blur(${progress * 20}px)`;
-            }
-        }
-
-        // Inizializza tutto al caricamento della pagina
-        window.onload = () => {
-            // Carica l'SDK di SoundCloud
-            const script = document.createElement("script");
-            script.src = "https://w.soundcloud.com/player/api.js";
-            script.onload = initSoundCloud;
-            document.body.appendChild(script);
-
-            const triggerAudio = document.getElementById("triggerAudio");
-            triggerAudio.addEventListener("mousemove", handleInteraction);
-            triggerAudio.addEventListener("touchstart", startAudio); // Avvia l'audio al tocco su mobile
-            triggerAudio.addEventListener("mouseleave", resetImage);
-            triggerAudio.addEventListener("touchend", resetImage);
-
-            // Applica l'effetto di melt ogni secondo
-            setInterval(applyMeltEffect, 1000);
-        };
+        document.getElementById("triggerAudio").addEventListener("mouseenter", function () {
+            let iframe = document.getElementById("soundcloudWidget");
+            iframe.src = iframe.src; // Ricarica il widget per forzare il play
+        });
     </script>
 </body>
 </html>
