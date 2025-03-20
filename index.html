@@ -5,44 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ROSBOC AUTOMATON</title>
     <style>
-        body {
+        /* Reset */
+        body, html {
             margin: 0;
             padding: 0;
             background-color: #000;
             color: #fff;
-            font-family: 'Press Start 2P', cursive;
-            text-align: center;
+            font-family: 'Orbitron', sans-serif;
             overflow-x: hidden;
         }
 
+        /* Container principale */
         .container {
-            padding: 20px;
+            padding: 50px;
+            text-align: center;
+            background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+            border: 2px solid #00ff00;
+            box-shadow: 0 0 50px #00ff00;
         }
 
+        /* Titolo con effetto cappio */
         .title {
-            font-size: 3rem;
+            font-size: 4.5rem;
+            color: #00ff00;
+            text-shadow: 0 0 20px #00ff00, 0 0 40px #00ff00;
             animation: loopEffect 2s infinite;
         }
 
         @keyframes loopEffect {
             0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
+            50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
 
+        /* Sottotitolo con font pixelato */
         .subtitle {
-            font-size: 1.5rem;
-            margin-top: 10px;
-            font-family: 'Press Start 2P', cursive;
+            font-size: 2rem;
             color: #ff00ff;
+            text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+            margin-top: 20px;
         }
 
+        /* Immagine con effetto morphing e rotazione */
         .image-container {
-            margin: 20px auto;
-            width: 300px;
-            height: 300px;
-            overflow: hidden;
+            margin: 40px auto;
+            width: 400px;
+            height: 400px;
+            border: 5px solid #00ff00;
             border-radius: 50%;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 0 50px #00ff00;
         }
 
         .rosboc-image {
@@ -52,23 +65,75 @@
             transition: transform 0.5s ease-in-out;
         }
 
-        .rosboc-image:hover {
-            transform: rotate(360deg) scale(1.5);
+        .image-container:hover .rosboc-image {
+            transform: rotate(720deg) scale(1.5);
+            filter: hue-rotate(360deg);
         }
 
+        /* Testo interattivo */
         .interactive-text {
-            font-size: 1rem;
-            margin-top: 20px;
-            cursor: pointer;
+            font-size: 1.2rem;
             color: #00ff00;
+            margin-top: 30px;
+            cursor: pointer;
             text-decoration: underline;
+            transition: color 0.3s ease;
         }
 
         .interactive-text:hover {
-            cursor: pointer;
+            color: #ff00ff;
+            text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+        }
+
+        /* Sezione funzioni inventate */
+        .features {
+            margin-top: 50px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .feature {
+            background: #1a1a1a;
+            padding: 20px;
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            box-shadow: 0 0 20px #00ff00;
+            transition: transform 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: scale(1.05);
+        }
+
+        .feature h3 {
+            font-size: 1.5rem;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+        }
+
+        .feature p {
+            font-size: 1rem;
+            color: #ccc;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 50px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        footer a {
+            color: #00ff00;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-shadow: 0 0 10px #00ff00;
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
@@ -80,14 +145,34 @@
         <p class="interactive-text" onclick="window.open('https://docs.google.com/document/d/11tJpl_25A9e0FIx2nX-t4q-7qu4K2IfaUH8wHWXjzWE/edit?tab=t.0', '_blank')">
             La musica generata dipende dalla tua interazione. Attraverso l’interpretabilità del protocollo MIDI, ROSBOC è in grado di tracciare porosità che lavorano su uno slittamento del senso percettivo generando un contatto tra TE e i DATI, tra il tuo profilo acustico esistenziale e la acquisizione reale del virtuale.
         </p>
+
+        <!-- Sezione funzioni inventate -->
+        <div class="features">
+            <div class="feature">
+                <h3>Neuro-Sonificazione</h3>
+                <p>ROSBOC trasforma le tue onde cerebrali in suoni MIDI in tempo reale. Usa un'interfaccia neurale per creare musica direttamente dai tuoi pensieri.</p>
+            </div>
+            <div class="feature">
+                <h3>Realtà Aumentata Acustica</h3>
+                <p>Con ROSBOC, puoi "vedere" i suoni nello spazio 3D. Ogni nota MIDI genera un ologramma sonoro interattivo.</p>
+            </div>
+            <div class="feature">
+                <h3>AI Emotiva</h3>
+                <p>L'intelligenza artificiale di ROSBOC analizza le tue emozioni e le traduce in armonie complesse, creando una sinfonia unica per ogni stato d'animo.</p>
+            </div>
+        </div>
     </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>ROSBOC AUTOMATON &copy; 2023 | <a href="#" target="_blank">Privacy Policy</a></p>
+    </footer>
+
+    <!-- Musica SoundCloud in background -->
     <iframe id="soundcloud-player" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/123456789&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false" style="display: none;"></iframe>
+
     <script>
         // Riproduci automaticamente la musica di SoundCloud
         window.onload = function() {
             const iframe = document.getElementById('soundcloud-player');
-            iframe.src = "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/123456789&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false";
-        };
-    </script>
-</body>
-</html>
+            iframe.src = "https://w
