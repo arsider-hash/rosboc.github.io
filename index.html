@@ -43,7 +43,7 @@
         .image-container img {
             max-width: 100%;
             height: auto;
-            transition: transform 0.1s ease, filter 0.1s ease;
+            transition: filter 0.1s ease, transform 0.1s ease;
         }
 
         .description {
@@ -90,6 +90,8 @@
 
         document.getElementById('triggerAudio').addEventListener('mouseleave', () => {
             isPlaying = false;
+            image.style.filter = 'none';
+            image.style.transform = 'none';
         });
 
         document.addEventListener('mousemove', (e) => {
@@ -97,29 +99,40 @@
                 const x = e.clientX / window.innerWidth;
                 const y = e.clientY / window.innerHeight;
 
-                const scale = 1 + Math.random() * 0.5;
-                const rotateX = (y - 0.5) * 180;
-                const rotateY = (x - 0.5) * 180;
-                const skewX = (x - 0.5) * 50;
-                const skewY = (y - 0.5) * 50;
                 const blur = Math.random() * 5 + 'px';
                 const brightness = Math.random() * 0.8 + 0.8;
                 const hueRotate = Math.random() * 360 + 'deg';
+                const translateX = (x - 0.5) * 50 + 'px';
+                const translateY = (y - 0.5) * 50 + 'px';
+                const scaleX = 1 + (x - 0.5) * 0.5;
+                const scaleY = 1 + (y - 0.5) * 0.5;
+                const perspective = Math.random() * 500 + 500 + 'px';
+                const rotateX = (y - 0.5) * 30 + 'deg';
+                const rotateY = (x - 0.5) * 30 + 'deg';
 
-                image.style.transform = `scale(${scale}) rotateX(${rotateX}deg) rotateY(${rotateY}deg) skew(${skewX}deg, ${skewY}deg)`;
                 image.style.filter = `blur(${blur}) brightness(${brightness}) hue-rotate(${hueRotate})`;
-            } else {
-                image.style.transform = 'none';
-                image.style.filter = 'none';
+                image.style.transform = `translateX(${translateX}) translateY(${translateY}) scale(${scaleX}, ${scaleY}) perspective(${perspective}) rotateX(${rotateX}) rotateY(${rotateY})`;
+
             }
         });
 
-        document.addEventListener('touchstart', () => {
-            if (!isPlaying) {
+        document.addEventListener('touchstart', (e) => {
+             if (!isPlaying) {
                 soundcloudWidget.src = soundcloudWidget.src;
                 isPlaying = true;
             }
-        }, { once: true });
+            const touch = e.touches[0];
+            const x = touch.clientX / window.innerWidth;
+            const y = touch.clientY / window.innerHeight;
+            image.style.filter = `blur(${Math.random() * 5 + 'px'}) brightness(${Math.random() * 0.8 + 0.8}) hue-rotate(${Math.random() * 360 + 'deg'})`;
+            image.style.transform = `translateX(${(x - 0.5) * 50 + 'px'}) translateY(${(y - 0.5) * 50 + 'px'}) scale(${1 + (x - 0.5) * 0.5}, ${1 + (y - 0.5) * 0.5}) perspective(${Math.random() * 500 + 500 + 'px'}) rotateX(${(y - 0.5) * 30 + 'deg'}) rotateY(${(x - 0.5) * 30 + 'deg'})`;
+        }, { passive: true });
+
+        document.addEventListener('touchend', () => {
+            isPlaying = false;
+            image.style.filter = 'none';
+            image.style.transform = 'none';
+        });
     </script>
 </body>
 </html>
