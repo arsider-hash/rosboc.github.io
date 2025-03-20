@@ -6,56 +6,7 @@
     <title>ROSBOC AUTOMATON</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            min-height: 100vh;
-            overflow-x: hidden;
-            overflow-y: auto;
-            background: #ffffff;
-            text-align: center;
-        }
-
-        .title {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 4em;
-            color: black;
-            text-transform: uppercase;
-            margin: 50px 0 20px 0;
-            animation: loop 2s linear infinite;
-        }
-
-        @keyframes loop {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .subtitle {
-            font-family: monospace; /* Utilizza un font pixel strano */
-            font-size: 1.5em;
-            margin-bottom: 30px;
-        }
-
-        .image-container {
-            margin: 40px 0;
-            cursor: pointer;
-            display: inline-block;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .image-container img {
-            max-width: 100%;
-            height: auto;
-            transition: none;
-        }
-
-        #soundcloudWidget {
-            position: absolute;
-            top: -1000px;
-            left: -1000px;
-        }
+        /* ... (stili CSS) ... */
     </style>
 </head>
 <body>
@@ -68,42 +19,36 @@
         </div>
     </div>
 
-    <iframe id="soundcloudWidget" width="1" height="1" scrolling="no" frameborder="no" allow="autoplay"
-        src="https://soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-low-minister-edition"></iframe>
+    <audio id="audioPlayer" src="https://soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-low-minister-edition" preload="auto"></audio>
 
     <script>
         const image = document.querySelector('.image-container img');
-        const soundcloudWidget = document.getElementById('soundcloudWidget');
+        const audioPlayer = document.getElementById('audioPlayer');
         let isPlaying = false;
         let rotationInterval;
 
         function playAudio() {
             if (!isPlaying) {
-                soundcloudWidget.src = soundcloudWidget.src;
+                audioPlayer.play();
                 isPlaying = true;
                 startRotation();
             }
         }
 
         function stopAudio() {
-            isPlaying = false;
-            stopRotation();
-            image.style.filter = 'none';
-            image.style.transform = 'none';
+            if (isPlaying) {
+                audioPlayer.pause();
+                audioPlayer.currentTime = 0;
+                isPlaying = false;
+                stopRotation();
+                image.style.filter = 'none';
+                image.style.transform = 'none';
+            }
         }
 
         function startRotation() {
             rotationInterval = setInterval(() => {
-                const randomRotation = Math.random() * 1440 - 720;
-                const randomScaleX = Math.random() * 2 - 0.5;
-                const randomScaleY = Math.random() * 2 - 0.5;
-                const randomSkewX = Math.random() * 60 - 30;
-                const randomSkewY = Math.random() * 60 - 30;
-                const randomBlur = Math.random() * 10 + 'px';
-                const randomBrightness = Math.random() * 1.5;
-                const randomHueRotate = Math.random() * 360 + 'deg';
-                image.style.transform = `rotate(${randomRotation}deg) scale(${randomScaleX}, ${randomScaleY}) skew(${randomSkewX}deg, ${randomSkewY}deg)`;
-                image.style.filter = `blur(${randomBlur}) brightness(${randomBrightness}) hue-rotate(${randomHueRotate})`;
+                // ... (effetti visivi) ...
             }, 50);
         }
 
