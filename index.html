@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARSIDER | ROSBOC</title>
-    <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         html, body {
             margin: 0;
@@ -31,11 +31,10 @@
         }
 
         .title {
-            font-family: 'UnifrakturMaguntia', cursive;
+            font-family: 'Press Start 2P', cursive;
             font-size: 6em;
-            color: red;
-            -webkit-text-stroke: 2px black;
-            text-stroke: 2px black;
+            color: black;
+            text-transform: uppercase;
             cursor: pointer;
             margin: 50px 0;
             text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
@@ -72,7 +71,7 @@
     <h1 class="title">ROSBOC</h1>
 
     <div class="content">
-        <div class="image-container" onmouseover="startAudio()" onclick="startAudio()">
+        <div class="image-container" onmouseover="startAudio()">
             <img src="https://www.repstatic.it/content/localirep/img/rep-torino/2018/01/09/173945946-93f90b9e-3303-445e-8892-b0f097c73e8f.jpg" alt="Sistema ROSBOC">
         </div>
 
@@ -83,16 +82,13 @@
     </div>
 
     <!-- Audio element -->
-    <audio id="audio" src="https://soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-low-minister-edition" crossorigin="anonymous"></audio>
+    <iframe id="audio" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" 
+        src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-low-minister-edition&auto_play=true"></iframe>
 
     <script>
-        let audioStarted = false;
         function startAudio() {
-            const audio = document.getElementById('audio');
-            if (!audioStarted) {
-                audio.play();
-                audioStarted = true;
-            }
+            const iframe = document.getElementById('audio');
+            iframe.src = iframe.src; // Ricarica l'iframe per forzare il play
         }
     </script>
 </body>
