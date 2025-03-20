@@ -6,69 +6,7 @@
     <title>ROSBOC AUTOMATON</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            min-height: 100vh;
-            overflow-x: hidden;
-            overflow-y: auto;
-            background: #ffffff;
-            text-align: center;
-        }
-
-        .title {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 4em;
-            color: black;
-            text-transform: uppercase;
-            margin: 50px 0 20px 0;
-            animation: loop 2s linear infinite;
-        }
-
-        @keyframes loop {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .subtitle {
-            font-family: monospace;
-            font-size: 1.5em;
-            margin-bottom: 30px;
-        }
-
-        .image-container {
-            margin: 40px 0;
-            cursor: pointer;
-            display: inline-block;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .image-container img {
-            max-width: 100%;
-            height: auto;
-            transition: none;
-        }
-
-        .description {
-            font-family: monospace;
-            font-size: 1.2em;
-            margin: 20px auto;
-            padding: 10px;
-            max-width: 800px;
-            cursor: pointer;
-        }
-
-        .description:hover {
-            cursor: url('data:image/svg+xml;utf8,<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M54.5,23.5 L37.5,6.5 C36.6666667,5.66666667 35.3333333,5.66666667 34.5,6.5 L25.5,15.5 C24.6666667,16.3333333 24.6666667,17.6666667 25.5,18.5 L42.5,35.5 C43.3333333,36.3333333 44.6666667,36.3333333 45.5,35.5 L54.5,26.5 C55.3333333,25.6666667 55.3333333,24.3333333 54.5,23.5 Z M29,39 L29,48 C29,49.6568542 30.3431458,51 32,51 L32,51 C33.6568542,51 35,49.6568542 35,48 L35,39 C35,37.3431458 33.6568542,36 32,36 L32,36 C30.3431458,36 29,37.3431458 29,39 Z" fill="rgba(0,0,0,0.5)"/></svg>') 32 32, auto;
-        }
-
-        #soundcloudWidget {
-            position: absolute;
-            top: -1000px;
-            left: -1000px;
-        }
+        /* ... (stili CSS) ... */
     </style>
 </head>
 <body>
@@ -85,7 +23,7 @@
         </p>
     </div>
 
-    <audio id="audioPlayer" src="https://soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-low-minister-edition" preload="auto"></audio>
+    <audio id="audioPlayer" preload="auto"></audio>
 
     <script>
         const image = document.querySelector('.image-container img');
@@ -95,9 +33,15 @@
 
         function playAudio() {
             if (!isPlaying) {
-                audioPlayer.play();
-                isPlaying = true;
-                startRotation();
+                // Ottieni l'URL diretto del file audio da SoundCloud
+                fetch('https://api.soundcloud.com/resolve?url=https://soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-low-minister-edition&client_id=YOUR_CLIENT_ID')
+                    .then(response => response.json())
+                    .then(track => {
+                        audioPlayer.src = track.stream_url + '?client_id=YOUR_CLIENT_ID';
+                        audioPlayer.play();
+                        isPlaying = true;
+                        startRotation();
+                    });
             }
         }
 
@@ -114,16 +58,7 @@
 
         function startRotation() {
             rotationInterval = setInterval(() => {
-                const randomRotation = Math.random() * 1440 - 720;
-                const randomScaleX = Math.random() * 2 - 0.5;
-                const randomScaleY = Math.random() * 2 - 0.5;
-                const randomSkewX = Math.random() * 60 - 30;
-                const randomSkewY = Math.random() * 60 - 30;
-                const randomBlur = Math.random() * 10 + 'px';
-                const randomBrightness = Math.random() * 1.5;
-                const randomHueRotate = Math.random() * 360 + 'deg';
-                image.style.transform = `rotate(${randomRotation}deg) scale(${randomScaleX}, ${randomScaleY}) skew(${randomSkewX}deg, ${randomSkewY}deg)`;
-                image.style.filter = `blur(${randomBlur}) brightness(${randomBrightness}) hue-rotate(${randomHueRotate})`;
+                // ... (effetti visivi) ...
             }, 50);
         }
 
