@@ -5,14 +5,21 @@
     <title>ARSIDER | ROSBOC</title>
     <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
     <style>
+        /* Reset per garantire che la pagina sia sempre scrollabile */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto; /* Permette lo scroll verticale */
+        }
+
         body {
             font-family: 'Arial', sans-serif;
             background: #ffffff;
-            margin: 0;
             padding: 20px;
-            min-height: 100vh;
             text-align: center;
-            overflow: hidden;
         }
 
         .arsider-brand {
@@ -116,11 +123,14 @@
             element.style.transform = "scale(1)";
         }
 
+        // Flag per controllare se l'audio è già stato avviato
+        let audioStarted = false;
+
         // Funzione per avviare l'audio al passaggio del mouse
         function startAudioOnHover() {
-            if (!window.audioStarted) {
+            if (!audioStarted) {
                 playRandomAudio();
-                window.audioStarted = true; // Imposta un flag per evitare riavvii multipli
+                audioStarted = true; // Imposta un flag per evitare riavvii multipli
             }
         }
 
