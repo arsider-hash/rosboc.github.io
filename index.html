@@ -37,7 +37,7 @@
                 fetch('https://api.soundcloud.com/resolve?url=https://soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-low-minister-edition&client_id=YOUR_CLIENT_ID')
                     .then(response => response.json())
                     .then(track => {
-                        audioPlayer.src = track.stream_url + '?client_id=YOUR_CLIENT_ID';
+                        audioPlayer.src = track.stream_url + '?client_id=1pFK3p8nWlwQb86Ot1wJztDoiukKKkGr';
                         audioPlayer.play();
                         isPlaying = true;
                         startRotation();
