@@ -11,7 +11,7 @@
             padding: 0;
             background-color: #ffffff;
             color: #000000;
-            font-family: 'Exo 2', sans-serif;
+            font-family: 'UnifrakturMaguntia', cursive;
             overflow-x: hidden;
         }
 
@@ -23,40 +23,42 @@
             margin: 0 auto;
         }
 
-        /* Titolo con effetto futuristico */
+        /* Titolo con font black metal */
         .title {
-            font-size: 5rem;
-            font-weight: 900;
+            font-size: 6rem;
+            font-family: 'UnifrakturMaguntia', cursive;
             color: #000000;
             text-transform: uppercase;
-            letter-spacing: 10px;
-            background: linear-gradient(90deg, #000000, #555555, #000000);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: textGlow 3s infinite alternate;
+            letter-spacing: 5px;
+            text-shadow: 2px 2px 0 #ff0000, 4px 4px 0 #000000;
+            margin-bottom: 20px;
+            animation: flicker 1.5s infinite alternate;
         }
 
-        @keyframes textGlow {
-            0% { text-shadow: 0 0 10px #000000, 0 0 20px #000000; }
-            100% { text-shadow: 0 0 20px #555555, 0 0 40px #555555; }
+        @keyframes flicker {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
         }
 
-        /* Sottotitolo con font moderno */
+        /* Sottotitolo con font outline */
         .subtitle {
-            font-size: 2rem;
-            font-weight: 300;
-            color: #333333;
-            margin-top: 20px;
-            letter-spacing: 2px;
-            animation: fadeIn 2s ease-in;
+            font-size: 2.5rem;
+            font-family: 'Bebas Neue', sans-serif;
+            color: transparent;
+            -webkit-text-stroke: 2px #000000;
+            letter-spacing: 3px;
+            margin-top: 10px;
+            animation: float 3s infinite ease-in-out;
         }
 
-        @keyframes fadeIn {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
         }
 
-        /* Immagine con effetto morphing e rotazione */
+        /* Immagine con effetto distorsione */
         .image-container {
             margin: 40px auto;
             width: 300px;
@@ -78,21 +80,22 @@
 
         .image-container:hover .rosboc-image {
             transform: rotate(360deg) scale(1.2);
-            filter: grayscale(100%);
+            filter: grayscale(100%) contrast(200%);
         }
 
         /* Testo interattivo */
         .interactive-text {
-            font-size: 1.2rem;
+            font-size: 1.5rem;
+            font-family: 'Bebas Neue', sans-serif;
             color: #000000;
             margin-top: 30px;
             cursor: pointer;
-            text-decoration: underline;
+            text-decoration: none;
             transition: color 0.3s ease, transform 0.3s ease;
         }
 
         .interactive-text:hover {
-            color: #555555;
+            color: #ff0000;
             transform: scale(1.1);
         }
 
@@ -118,13 +121,16 @@
         }
 
         .feature h3 {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
+            font-family: 'UnifrakturMaguntia', cursive;
             color: #000000;
             margin-bottom: 10px;
+            text-shadow: 1px 1px 0 #ff0000;
         }
 
         .feature p {
             font-size: 1rem;
+            font-family: 'Bebas Neue', sans-serif;
             color: #555555;
         }
 
@@ -132,6 +138,7 @@
         footer {
             margin-top: 50px;
             font-size: 0.9rem;
+            font-family: 'Bebas Neue', sans-serif;
             color: #777777;
         }
 
@@ -142,18 +149,17 @@
         }
 
         footer a:hover {
-            color: #555555;
+            color: #ff0000;
         }
 
         /* Ottimizzazione mobile */
         @media (max-width: 768px) {
             .title {
-                font-size: 3rem;
-                letter-spacing: 5px;
+                font-size: 4rem;
             }
 
             .subtitle {
-                font-size: 1.5rem;
+                font-size: 2rem;
             }
 
             .image-container {
@@ -162,7 +168,7 @@
             }
 
             .interactive-text {
-                font-size: 1rem;
+                font-size: 1.2rem;
             }
 
             .features {
@@ -170,7 +176,7 @@
             }
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Bebas+Neue&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
@@ -206,13 +212,13 @@
     </footer>
 
     <!-- Musica SoundCloud in background -->
-    <iframe id="soundcloud-player" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/123456789&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false" style="display: none;"></iframe>
+    <iframe id="soundcloud-player" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1799362339&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false" style="display: none;"></iframe>
 
     <script>
         // Riproduci automaticamente la musica di SoundCloud
         window.onload = function() {
             const iframe = document.getElementById('soundcloud-player');
-            iframe.src = "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/123456789&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false";
+            iframe.src = "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1799362339&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false";
         };
     </script>
 </body>
