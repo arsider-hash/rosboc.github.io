@@ -45,7 +45,7 @@
         .image-container img {
             max-width: 100%;
             height: auto;
-            transition: transform 0.2s ease;
+            transition: transform 0.2s ease, filter 0.2s ease;
         }
 
         .content {
@@ -70,7 +70,7 @@
         <div class="image-container" id="triggerAudio">
             <img id="image" src="https://www.repstatic.it/content/localirep/img/rep-torino/2018/01/09/173945946-93f90b9e-3303-445e-8892-b0f097c73e8f.jpg" alt="Sistema ROSBOC">
         </div>
-        <p class="description" id="description">
+        <p class="description" id="description" onclick="window.open('https://docs.google.com/document/d/11tJpl_25A9e0FIx2nX-t4q-7qu4K2IfaUH8wHWXjzWE/edit?tab=t.0', '_blank')">
             La musica generata dipende dalla tua interazione. Attraverso l’interpretabilità del protocollo MIDI, ROSBOC è in grado di tracciare porosità che lavorano su uno slittamento del senso percettivo generando un contatto tra TE e i DATI, tra il tuo profilo acustico esistenziale e la acquisizione reale del virtuale.
         </p>
     </div>
@@ -85,20 +85,14 @@
         function initAudio() {
             player = new Tone.Player({
                 url: "https://soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-low-minister-edition",
-                autostart: false,
-                onload: () => console.log("Audio caricato!")
+                autostart: true, // L'audio parte subito
+                onload: () => {
+                    console.log("Audio caricato!");
+                    player.start();
+                    player.loop = true; // Loop dell'audio
+                    player.playbackRate = 1; // Velocità normale iniziale
+                }
             }).toDestination();
-        }
-
-        function startAudio(x, y) {
-            if (!audioStarted) {
-                Tone.start();
-                audioStarted = true;
-                player.start();
-            }
-            const duration = player.buffer.duration;
-            player.seek(x * duration);
-            player.playbackRate = 0.5 + y;
         }
 
         function handleInteraction(event) {
@@ -108,22 +102,24 @@
             const x = (clientX - rect.left) / rect.width;
             const y = (clientY - rect.top) / rect.height;
 
-            startAudio(x, y);
+            // Pitch control: alto = pitch up, basso = pitch down
+            player.playbackRate = 1 + (y - 0.5) * 2; // Pitch varia tra 0.5 e 1.5
 
-            // Apply image transformations
-            image.style.transform = `scale(${1 + y}, ${1 + x})`;
+            // Warping estremo dell'immagine
+            const skewX = (x - 0.5) * 50; // Skew orizzontale
+            const skewY = (y - 0.5) * 50; // Skew verticale
+            const scaleX = 1 + Math.abs(x - 0.5) * 2; // Scale orizzontale
+            const scaleY = 1 + Math.abs(y - 0.5) * 2; // Scale verticale
+
+            image.style.transform = `skew(${skewX}deg, ${skewY}deg) scale(${scaleX}, ${scaleY})`;
+            image.style.filter = `brightness(${1 + y}) contrast(${1 + x})`;
         }
 
-        function handleDescriptionInteraction(event) {
-            window.open('https://docs.google.com/document/d/11tJpl_25A9e0FIx2nX-t4q-7qu4K2IfaUH8wHWXjzWE/edit?tab=t.0', '_blank');
-        }
-
-        document.getElementById("triggerAudio").addEventListener("mousemove", handleInteraction);
-        document.getElementById("triggerAudio").addEventListener("touchmove", handleInteraction);
-        document.getElementById("triggerAudio").addEventListener("click", handleInteraction);
-        description.addEventListener("mouseover", handleDescriptionInteraction);
-        description.addEventListener("touchstart", handleDescriptionInteraction);
-        window.onload = initAudio;
+        window.onload = () => {
+            initAudio();
+            document.getElementById("triggerAudio").addEventListener("mousemove", handleInteraction);
+            document.getElementById("triggerAudio").addEventListener("touchmove", handleInteraction);
+        };
     </script>
 </body>
 </html>
