@@ -44,7 +44,7 @@
         .image-container img {
             max-width: 100%;
             height: auto;
-            transition: transform 0.2s ease, filter 0.2s ease;
+            transition: transform 0.2s ease, filter 0.2s ease, opacity 0.5s ease;
         }
 
         .content {
@@ -78,11 +78,32 @@
         </p>
     </div>
 
-    <!-- Player SoundCloud -->
-    <iframe class="soundcloud-player" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1776684379&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe>
+    <!-- Widget SoundCloud -->
+    <iframe id="soundcloudWidget" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1776684379&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe>
 
     <script>
         let image = document.getElementById('image');
+        let soundcloudWidget = document.getElementById('soundcloudWidget');
+        let widget;
+        let startTime = 0;
+        let isPlaying = false;
+
+        // Inizializza il widget SoundCloud
+        function initSoundCloud() {
+            widget = SC.Widget(soundcloudWidget);
+            widget.bind(SC.Widget.Events.READY, () => {
+                console.log("SoundCloud widget pronto!");
+            });
+        }
+
+        // Avvia l'audio
+        function startAudio() {
+            if (!isPlaying) {
+                widget.play();
+                isPlaying = true;
+                startTime = Date.now();
+            }
+        }
 
         // Gestisce l'interazione con l'immagine
         function handleInteraction(event) {
@@ -100,6 +121,11 @@
 
             image.style.transform = `skew(${skewX}deg, ${skewY}deg) scale(${scaleX}, ${scaleY})`;
             image.style.filter = `blur(${Math.abs(x - 0.5) * 10}px) brightness(${1 + y})`;
+
+            // Avvia l'audio al passaggio del mouse (solo su PC)
+            if (event.type === "mousemove") {
+                startAudio();
+            }
         }
 
         // Ripristina l'immagine quando il mouse/tocco esce
@@ -108,13 +134,37 @@
             image.style.filter = "blur(5px)"; // Foto torna normale ma blurrata
         }
 
+        // Effetto di melt progressivo
+        function applyMeltEffect() {
+            const elapsedTime = (Date.now() - startTime) / 1000; // Tempo in secondi
+            if (elapsedTime >= 20) {
+                image.style.opacity = "0";
+                image.style.transform = "scale(0.5) rotate(180deg)";
+                image.style.filter = "blur(20px)";
+            } else if (elapsedTime >= 10) {
+                const progress = (elapsedTime - 10) / 10; // Progresso tra 10 e 20 secondi
+                image.style.opacity = `${1 - progress}`;
+                image.style.transform = `scale(${1 - progress * 0.5}) rotate(${progress * 180}deg)`;
+                image.style.filter = `blur(${progress * 20}px)`;
+            }
+        }
+
         // Inizializza tutto al caricamento della pagina
         window.onload = () => {
+            // Carica l'SDK di SoundCloud
+            const script = document.createElement("script");
+            script.src = "https://w.soundcloud.com/player/api.js";
+            script.onload = initSoundCloud;
+            document.body.appendChild(script);
+
             const triggerAudio = document.getElementById("triggerAudio");
             triggerAudio.addEventListener("mousemove", handleInteraction);
-            triggerAudio.addEventListener("touchmove", handleInteraction);
+            triggerAudio.addEventListener("touchstart", startAudio); // Avvia l'audio al tocco su mobile
             triggerAudio.addEventListener("mouseleave", resetImage);
             triggerAudio.addEventListener("touchend", resetImage);
+
+            // Applica l'effetto di melt ogni secondo
+            setInterval(applyMeltEffect, 1000);
         };
     </script>
 </body>
