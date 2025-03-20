@@ -2,6 +2,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARSIDER | ROSBOC</title>
     <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
     <style>
@@ -58,6 +59,7 @@
             cursor: pointer;
             overflow: hidden;
             position: relative;
+            touch-action: none; /* Permette il touch per il morphing */
         }
 
         .image-container img {
@@ -71,8 +73,28 @@
             display: none;
         }
 
+        /* Pulsante per avviare l'audio su mobile */
+        .audio-button {
+            display: none; /* Nascosto di default */
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            background-color: #ff5500;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Mostra il pulsante solo su mobile */
+        @media (max-width: 768px) {
+            .audio-button {
+                display: block;
+            }
+        }
+
         /* Effetto dinamico di morphing */
-        .image-container:hover img {
+        .image-container:hover img, .image-container:active img {
             transition: none; /* Disabilita transizioni durante il morphing */
         }
     </style>
@@ -83,9 +105,12 @@
     <h1 class="title" onclick="breakTitle()">ROSBOC</h1>
 
     <div class="content">
-        <div class="image-container" onmouseover="startAudioOnHover()" onmousemove="applyMorphEffect(event)">
+        <div class="image-container" onmouseover="startAudioOnHover()" onmousemove="applyMorphEffect(event)" ontouchmove="applyMorphEffect(event)">
             <img id="morph-image" src="https://www.repstatic.it/content/localirep/img/rep-torino/2018/01/09/173945946-93f90b9e-3303-445e-8892-b0f097c73e8f.jpg" alt="Sistema ROSBOC">
         </div>
+
+        <!-- Pulsante per avviare l'audio su mobile -->
+        <button class="audio-button" onclick="startAudioOnHover()">Avvia audio</button>
 
         <p style="font-size: 1.5em; font-weight: bold; cursor: pointer;" 
            onmouseover="makeCursorBig(this)" 
@@ -126,7 +151,7 @@
         // Flag per controllare se l'audio è già stato avviato
         let audioStarted = false;
 
-        // Funzione per avviare l'audio al passaggio del mouse
+        // Funzione per avviare l'audio al passaggio del mouse o al tocco
         function startAudioOnHover() {
             if (!audioStarted) {
                 playRandomAudio();
@@ -150,8 +175,13 @@
         function applyMorphEffect(event) {
             const img = document.getElementById('morph-image');
             const rect = event.currentTarget.getBoundingClientRect();
-            const x = (event.clientX - rect.left) / rect.width; // Posizione X normalizzata (0-1)
-            const y = (event.clientY - rect.top) / rect.height; // Posizione Y normalizzata (0-1)
+            
+            // Gestione eventi touch e mouse
+            const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+            const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+
+            const x = (clientX - rect.left) / rect.width; // Posizione X normalizzata (0-1)
+            const y = (clientY - rect.top) / rect.height; // Posizione Y normalizzata (0-1)
 
             // Calcola i valori di blur e distorsione
             const blurValue = x * 20; // Blur massimo di 20px
@@ -167,6 +197,7 @@
             const iframe = document.getElementById('soundcloud-player');
             window.SC.Widget(iframe);
         };
-    </scrip<script src="https://w.soundcloud.com/player/api.js"></script>
+    </script>
+    <script src="https://w.soundcloud.com/player/api.js"></script>
 </body>
 </html>
