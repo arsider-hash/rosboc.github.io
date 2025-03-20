@@ -43,11 +43,12 @@
         .image-container img {
             max-width: 100%;
             height: auto;
-            transition: transform 0.3s ease;
+            transition: transform 0.1s ease;
         }
 
         .image-container:hover img {
-            transform: scale(1.1) rotate(2deg);
+            transform: skew(30deg, 10deg) scale(1.2) rotate(5deg);
+            filter: blur(3px) brightness(1.2);
         }
 
         .description {
