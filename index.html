@@ -45,6 +45,7 @@
         .image-container img {
             max-width: 100%;
             height: auto;
+            transition: transform 0.1s ease-out;
         }
 
         .content {
@@ -53,29 +54,34 @@
             line-height: 1.6;
             color: #444;
         }
+
+        .description {
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="arsider-brand">Progetto del gruppo ARSIDER</div>
     <h1 class="title">ROSBOC</h1>
     <div class="content">
-        <p style="font-size: 1.5em; font-weight: bold; cursor: pointer;" 
-           onclick="window.open('https://docs.google.com/document/d/11tJpl_25A9e0FIx2nX-t4q-7qu4K2IfaUH8wHWXjzWE/edit?usp=sharing', '_blank')">
-           La musica generata dipende dalla tua interazione. Attraverso l’interpretabilità del protocollo MIDI, ROSBOC è in grado di tracciare porosità che lavorano su uno slittamento del senso percettivo generando un contatto tra TE e i DATI, tra il tuo profilo acustico esistenziale e la acquisizione reale del virtuale.
-        </p>
         <div class="image-container" id="triggerAudio">
-            <img src="https://www.repstatic.it/content/localirep/img/rep-torino/2018/01/09/173945946-93f90b9e-3303-445e-8892-b0f097c73e8f.jpg" alt="Sistema ROSBOC">
+            <img id="image" src="https://www.repstatic.it/content/localirep/img/rep-torino/2018/01/09/173945946-93f90b9e-3303-445e-8892-b0f097c73e8f.jpg" alt="Sistema ROSBOC">
         </div>
+        <p class="description" id="description">La musica generata dipende dalla tua interazione. Attraverso l’interpretabilità del protocollo MIDI, ROSBOC è in grado di tracciare porosità che lavorano su uno slittamento del senso percettivo generando un contatto tra TE e i DATI, tra il tuo profilo acustico esistenziale e la acquisizione reale del virtuale.</p>
     </div>
     <audio id="audio" crossorigin="anonymous"></audio>
     
     <script>
         let player;
         let audioStarted = false;
+        const image = document.getElementById("image");
 
         function initAudio() {
             player = new Tone.Player({
-                url: "https://rosboc_automaton.s3.amazonaws.com/audio.mp3",
+                url: "https://soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-low-minister-edition",
                 autostart: false,
                 onload: () => console.log("Audio caricato!")
             }).toDestination();
@@ -99,10 +105,22 @@
             const x = (clientX - rect.left) / rect.width;
             const y = (clientY - rect.top) / rect.height;
             startAudio(x, y);
+            applyImageEffects(x, y);
+        }
+
+        function applyImageEffects(x, y) {
+            const scaleX = 1 + (x * 0.2);
+            const scaleY = 1 + (y * 0.2);
+            image.style.transform = `scale(${scaleX}, ${scaleY}) rotate(${x * 20 - 10}deg)`;
         }
 
         document.getElementById("triggerAudio").addEventListener("mousemove", handleInteraction);
         document.getElementById("triggerAudio").addEventListener("click", handleInteraction);
+
+        document.getElementById("description").addEventListener("mouseover", function() {
+            window.open("https://docs.google.com/document/d/11tJpl_25A9e0FIx2nX-t4q-7qu4K2IfaUH8wHWXjzWE/edit?tab=t.0", "_blank");
+        });
+        
         window.onload = initAudio;
     </script>
 </body>
