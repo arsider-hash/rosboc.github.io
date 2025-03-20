@@ -38,17 +38,18 @@
             display: inline-block;
             position: relative;
             overflow: hidden;
+            transition: transform 0.3s ease;
         }
 
         .image-container img {
             max-width: 100%;
             height: auto;
-            transition: transform 0.1s ease;
+            transition: transform 0.5s ease, filter 0.5s ease;
         }
 
         .image-container:hover img {
-            transform: skew(30deg, 10deg) scale(1.2) rotate(5deg);
-            filter: blur(3px) brightness(1.2);
+            transform: perspective(800px) rotateY(20deg) rotateX(10deg) scale(1.1);
+            filter: blur(5px) brightness(1.3) contrast(1.2) hue-rotate(15deg);
         }
 
         .description {
@@ -59,7 +60,9 @@
         }
 
         #soundcloudWidget {
-            display: none;
+            position: absolute;
+            top: -1000px; /* Sposta il player fuori dalla vista */
+            left: -1000px;
         }
     </style>
 </head>
@@ -72,12 +75,11 @@
         </div>
 
         <p class="description" onclick="window.open('https://docs.google.com/document/d/11tJpl_25A9e0FIx2nX-t4q-7qu4K2IfaUH8wHWXjzWE/edit?usp=sharing', '_blank')">
-           La musica generata dipende dalla tua interazione. Attraverso l’interpretabilità del protocollo MIDI, ROSBOC è in grado di tracciare porosità che lavorano su uno slittamento del senso percettivo generando un contatto tra TE e i DATI, tra il tuo profilo acustico esistenziale e la acquisizione reale del virtuale.
+            La musica generata dipende dalla tua interazione. Attraverso l’interpretabilità del protocollo MIDI, ROSBOC è in grado di tracciare porosità che lavorano su uno slittamento del senso percettivo generando un contatto tra TE e i DATI, tra il tuo profilo acustico esistenziale e la acquisizione reale del virtuale.
         </p>
     </div>
 
-    <!-- Hidden SoundCloud Player -->
-    <iframe id="soundcloudWidget" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay"
+    <iframe id="soundcloudWidget" width="1" height="1" scrolling="no" frameborder="no" allow="autoplay"
         src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-low-minister-edition&auto_play=true"></iframe>
 
     <script>
@@ -85,6 +87,12 @@
             let iframe = document.getElementById("soundcloudWidget");
             iframe.src = iframe.src; // Ricarica il widget per forzare il play
         });
+
+        // Forza il play su dispositivi mobili (richiede interazione utente iniziale)
+        document.addEventListener('touchstart', function() {
+            let iframe = document.getElementById("soundcloudWidget");
+            iframe.src = iframe.src;
+        }, { once: true });
     </script>
 </body>
 </html>
