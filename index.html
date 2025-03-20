@@ -6,7 +6,58 @@
     <title>ROSBOC</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        /* ... (stili CSS) ... */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            background: #ffffff;
+            text-align: center;
+        }
+
+        .title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 6em;
+            color: black;
+            text-transform: uppercase;
+            margin: 50px 0;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        .image-container {
+            margin: 40px 0;
+            cursor: pointer;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            transition: none; /* Rimuovi le transizioni CSS */
+        }
+
+        .description {
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        #soundcloudWidget {
+            position: absolute;
+            top: -1000px;
+            left: -1000px;
+        }
     </style>
 </head>
 <body>
@@ -47,9 +98,17 @@
 
         function startRotation() {
             rotationInterval = setInterval(() => {
-                const randomRotation = Math.random() * 720 - 360;
-                image.style.transform = `rotate(${randomRotation}deg)`;
-            }, 50); // Aggiorna la rotazione ogni 50ms
+                const randomRotation = Math.random() * 1440 - 720;
+                const randomScaleX = Math.random() * 2 - 0.5;
+                const randomScaleY = Math.random() * 2 - 0.5;
+                const randomSkewX = Math.random() * 60 - 30;
+                const randomSkewY = Math.random() * 60 - 30;
+                const randomBlur = Math.random() * 10 + 'px';
+                const randomBrightness = Math.random() * 1.5;
+                const randomHueRotate = Math.random() * 360 + 'deg';
+                image.style.transform = `rotate(${randomRotation}deg) scale(${randomScaleX}, ${randomScaleY}) skew(${randomSkewX}deg, ${randomSkewY}deg)`;
+                image.style.filter = `blur(${randomBlur}) brightness(${randomBrightness}) hue-rotate(${randomHueRotate})`;
+            }, 50);
         }
 
         function stopRotation() {
@@ -59,20 +118,8 @@
         document.getElementById('triggerAudio').addEventListener('mouseenter', playAudio);
         document.getElementById('triggerAudio').addEventListener('mouseleave', stopAudio);
 
-        document.getElementById('triggerAudio').addEventListener('touchstart', (e) => {
-            playAudio();
-            updateImageEffects(e.touches[0].clientX, e.touches[0].clientY);
-        }, { passive: true });
-
-        document.getElementById('triggerAudio').addEventListener('touchmove', (e) => {
-            updateImageEffects(e.touches[0].clientX, e.touches[0].clientY);
-        }, { passive: true });
-
-        document.getElementById('triggerAudio').addEventListener('touchend', stopAudio);
-
-        function updateImageEffects(clientX, clientY) {
-            // ... (effetti visivi) ...
-        }
+        document.getElementById('triggerAudio').addEventListener('touchstart', playAudio, { passive: true });
+        document.getElementById('triggerAudio').addEventListener('touchend', stopAudio, { passive: true });
     </script>
 </body>
 </html>
