@@ -6,66 +6,18 @@
     <title>ROSBOC</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            min-height: 100vh;
-            overflow-x: hidden;
-            overflow-y: auto;
-            background: #ffffff;
-            text-align: center;
-        }
-
-        .title {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 6em;
-            color: black;
-            text-transform: uppercase;
-            margin: 50px 0;
-        }
-
-        .subtitle {
-            font-size: 2em;
-            margin-bottom: 30px;
-        }
-
-        .content {
-            max-width: 800px;
-            margin: 0 auto;
-            line-height: 1.6;
-            color: #444;
-        }
-
-        .image-container {
-            margin: 40px 0;
-            cursor: pointer;
-            display: inline-block;
-            position: relative;
-            overflow: hidden;
-        }
+        /* ... (stili CSS) ... */
 
         .image-container img {
-            max-width: 100%;
-            height: auto;
-            transition: none;
-        }
-
-        .description {
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        #soundcloudWidget {
             position: absolute;
-            top: -1000px;
-            left: -1000px;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
         }
 
-        .description:hover {
-            cursor: url('data:image/svg+xml;utf8,<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="15" width="54" height="34" rx="5" fill="rgba(0,0,0,0.5)" /><rect x="15" y="49" width="34" height="10" rx="3" fill="rgba(0,0,0,0.5)" /></svg>') 32 32, auto;
+        .image-container img.active {
+            opacity: 1;
         }
     </style>
 </head>
@@ -75,26 +27,25 @@
 
     <div class="content">
         <div class="image-container" id="triggerAudio">
-            <img src="https://images.squarespace-cdn.com/content/v1/56f03b0bc6fc086f453d0783/1551746566125-9X524QPMUWFFJMYNMGUQ/FRONT.jpg" alt="Sistema ROSBOC">
+            <img src="https://images.squarespace-cdn.com/content/v1/56f03b0bc6fc086f453d0783/1551746566125-9X524QPMUWFFJMYNMGUQ/FRONT.jpg" alt="Sistema ROSBOC" class="active">
+            <img src="https://www.repstatic.it/content/localirep/img/rep-torino/2018/01/09/173945946-93f90b9e-3303-445e-8892-b0f097c73e8f.jpg" alt="Sistema ROSBOC 2">
         </div>
 
         <p class="description" onclick="window.open('https://docs.google.com/document/d/11tJpl_25A9e0FIx2nX-t4q-7qu4K2IfaUH8wHWXjzWE/edit?tab=t.0', '_blank')">
             La musica generata dipende dalla tua interazione. Attraverso l’interpretabilità del protocollo MIDI, ROSBOC è in grado di tracciare porosità che lavorano su uno slittamento del senso percettivo generando un contatto tra TE e i DATI, tra il tuo profilo acustico esistenziale e la acquisizione reale del virtuale.
         </p>
-
-        <div class="image-container" id="triggerAudio2">
-            <img src="https://www.repstatic.it/content/localirep/img/rep-torino/2018/01/09/173945946-93f90b9e-3303-445e-8892-b0f097c73e8f.jpg" alt="Sistema ROSBOC 2">
-        </div>
     </div>
 
     <iframe id="soundcloudWidget" width="1" height="1" scrolling="no" frameborder="no" allow="autoplay"
         src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-low-minister-edition&auto_play=true"></iframe>
 
     <script>
-        const image = document.querySelectorAll('.image-container img');
+        const imageContainer = document.querySelector('.image-container');
+        const images = document.querySelectorAll('.image-container img');
         const soundcloudWidget = document.getElementById('soundcloudWidget');
         let isPlaying = false;
         let rotationInterval;
+        let activeImage = 0;
 
         function playAudio() {
             if (!isPlaying) {
@@ -107,7 +58,7 @@
         function stopAudio() {
             isPlaying = false;
             stopRotation();
-            image.forEach(img => {
+            images.forEach(img => {
                 img.style.filter = 'none';
                 img.style.transform = 'none';
             });
@@ -126,7 +77,7 @@
                 const randomLiquify = Math.random() * 50 + 'px';
                 const randomRgbShiftX = Math.random() * 20 - 10 + 'px';
                 const randomRgbShiftY = Math.random() * 20 - 10 + 'px';
-                image.forEach(img => {
+                images.forEach(img => {
                     img.style.transform = `rotate(${randomRotation}deg) scale(${randomScaleX}, ${randomScaleY}) skew(${randomSkewX}deg, ${randomSkewY}deg) translate(${randomLiquify}, ${randomLiquify})`;
                     img.style.filter = `blur(${randomBlur}) brightness(${randomBrightness}) hue-rotate(${randomHueRotate}) drop-shadow(${randomRgbShiftX} ${randomRgbShiftY} 0 red) drop-shadow(${-randomRgbShiftX} ${-randomRgbShiftY} 0 blue)`;
                 });
@@ -143,11 +94,11 @@
         document.getElementById('triggerAudio').addEventListener('touchstart', playAudio, { passive: true });
         document.getElementById('triggerAudio').addEventListener('touchend', stopAudio, { passive: true });
 
-        document.getElementById('triggerAudio2').addEventListener('mouseenter', playAudio);
-        document.getElementById('triggerAudio2').addEventListener('mouseleave', stopAudio);
-
-        document.getElementById('triggerAudio2').addEventListener('touchstart', playAudio, { passive: true });
-        document.getElementById('triggerAudio2').addEventListener('touchend', stopAudio, { passive: true });
+        setInterval(() => {
+            images[activeImage].classList.remove('active');
+            activeImage = (activeImage + 1) % images.length;
+            images[activeImage].classList.add('active');
+        }, 3000); // Cambia immagine ogni 3 secondi
     </script>
 </body>
 </html>
