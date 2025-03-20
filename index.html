@@ -46,15 +46,28 @@
             max-width: 100%;
             height: auto;
         }
+
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            color: #444;
+        }
     </style>
 </head>
 <body>
     <div class="arsider-brand">Progetto del gruppo ARSIDER</div>
     <h1 class="title">ROSBOC</h1>
-    <div class="image-container" id="triggerAudio">
-        <img src="https://www.repstatic.it/content/localirep/img/rep-torino/2018/01/09/173945946-93f90b9e-3303-445e-8892-b0f097c73e8f.jpg" alt="Sistema ROSBOC">
+    <div class="content">
+        <p style="font-size: 1.5em; font-weight: bold; cursor: pointer;" 
+           onclick="window.open('https://docs.google.com/document/d/11tJpl_25A9e0FIx2nX-t4q-7qu4K2IfaUH8wHWXjzWE/edit?usp=sharing', '_blank')">
+           La musica generata dipende dalla tua interazione. Attraverso l’interpretabilità del protocollo MIDI, ROSBOC è in grado di tracciare porosità che lavorano su uno slittamento del senso percettivo generando un contatto tra TE e i DATI, tra il tuo profilo acustico esistenziale e la acquisizione reale del virtuale.
+        </p>
+        <div class="image-container" id="triggerAudio">
+            <img src="https://www.repstatic.it/content/localirep/img/rep-torino/2018/01/09/173945946-93f90b9e-3303-445e-8892-b0f097c73e8f.jpg" alt="Sistema ROSBOC">
+        </div>
     </div>
-    <audio id="audio" src="https://soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-gram-minister-edition" crossorigin="anonymous"></audio>
+    <audio id="audio" crossorigin="anonymous"></audio>
     
     <script>
         let player;
@@ -63,7 +76,8 @@
         function initAudio() {
             player = new Tone.Player({
                 url: "https://soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-gram-minister-edition",
-                autostart: false
+                autostart: false,
+                onload: () => console.log("Audio caricato!")
             }).toDestination();
         }
 
