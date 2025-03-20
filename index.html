@@ -6,58 +6,7 @@
     <title>ROSBOC</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            min-height: 100vh;
-            overflow-x: hidden;
-            overflow-y: auto;
-            background: #ffffff;
-            text-align: center;
-        }
-
-        .title {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 6em;
-            color: black;
-            text-transform: uppercase;
-            margin: 50px 0;
-        }
-
-        .content {
-            max-width: 800px;
-            margin: 0 auto;
-            line-height: 1.6;
-            color: #444;
-        }
-
-        .image-container {
-            margin: 40px 0;
-            cursor: pointer;
-            display: inline-block;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .image-container img {
-            max-width: 100%;
-            height: auto;
-            transition: filter 0.1s ease, transform 0.1s ease;
-        }
-
-        .description {
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        #soundcloudWidget {
-            position: absolute;
-            top: -1000px;
-            left: -1000px;
-        }
+        /* ... (stili CSS) ... */
     </style>
 </head>
 <body>
@@ -68,9 +17,8 @@
             <img src="https://www.repstatic.it/content/localirep/img/rep-torino/2018/01/09/173945946-93f90b9e-3303-445e-8892-b0f097c73e8f.jpg" alt="Sistema ROSBOC">
         </div>
 
-        <p class="description" onclick="window.open('https://docs.google.com/document/d/11tJpl_25A9e0FIx2nX-t4q-7qu4K2IfaUH8wHWXjzWE/edit?usp=sharing', '_blank')">
-            La musica generata dipende dalla tua interazione. Attraverso l’interpretabilità del protocollo MIDI, ROSBOC è in grado di tracciare porosità che lavorano su uno slittamento del senso percettivo generando un contatto tra TE e i DATI, tra il tuo profilo acustico esistenziale e la acquisizione reale del virtuale.
-        </p>
+        <p class="description">
+            </p>
     </div>
 
     <iframe id="soundcloudWidget" width="1" height="1" scrolling="no" frameborder="no" allow="autoplay"
@@ -80,59 +28,51 @@
         const image = document.querySelector('.image-container img');
         const soundcloudWidget = document.getElementById('soundcloudWidget');
         let isPlaying = false;
+        let rotationInterval;
 
-        document.getElementById('triggerAudio').addEventListener('mouseenter', () => {
+        function playAudio() {
             if (!isPlaying) {
                 soundcloudWidget.src = soundcloudWidget.src;
                 isPlaying = true;
+                startRotation();
             }
-        });
+        }
 
-        document.getElementById('triggerAudio').addEventListener('mouseleave', () => {
+        function stopAudio() {
             isPlaying = false;
+            stopRotation();
             image.style.filter = 'none';
             image.style.transform = 'none';
-        });
+        }
 
-        document.addEventListener('mousemove', (e) => {
-            if (isPlaying) {
-                const x = e.clientX / window.innerWidth;
-                const y = e.clientY / window.innerHeight;
+        function startRotation() {
+            rotationInterval = setInterval(() => {
+                const randomRotation = Math.random() * 720 - 360;
+                image.style.transform = `rotate(${randomRotation}deg)`;
+            }, 50); // Aggiorna la rotazione ogni 50ms
+        }
 
-                const blur = Math.random() * 5 + 'px';
-                const brightness = Math.random() * 0.8 + 0.8;
-                const hueRotate = Math.random() * 360 + 'deg';
-                const translateX = (x - 0.5) * 50 + 'px';
-                const translateY = (y - 0.5) * 50 + 'px';
-                const scaleX = 1 + (x - 0.5) * 0.5;
-                const scaleY = 1 + (y - 0.5) * 0.5;
-                const perspective = Math.random() * 500 + 500 + 'px';
-                const rotateX = (y - 0.5) * 30 + 'deg';
-                const rotateY = (x - 0.5) * 30 + 'deg';
+        function stopRotation() {
+            clearInterval(rotationInterval);
+        }
 
-                image.style.filter = `blur(${blur}) brightness(${brightness}) hue-rotate(${hueRotate})`;
-                image.style.transform = `translateX(${translateX}) translateY(${translateY}) scale(${scaleX}, ${scaleY}) perspective(${perspective}) rotateX(${rotateX}) rotateY(${rotateY})`;
+        document.getElementById('triggerAudio').addEventListener('mouseenter', playAudio);
+        document.getElementById('triggerAudio').addEventListener('mouseleave', stopAudio);
 
-            }
-        });
-
-        document.addEventListener('touchstart', (e) => {
-             if (!isPlaying) {
-                soundcloudWidget.src = soundcloudWidget.src;
-                isPlaying = true;
-            }
-            const touch = e.touches[0];
-            const x = touch.clientX / window.innerWidth;
-            const y = touch.clientY / window.innerHeight;
-            image.style.filter = `blur(${Math.random() * 5 + 'px'}) brightness(${Math.random() * 0.8 + 0.8}) hue-rotate(${Math.random() * 360 + 'deg'})`;
-            image.style.transform = `translateX(${(x - 0.5) * 50 + 'px'}) translateY(${(y - 0.5) * 50 + 'px'}) scale(${1 + (x - 0.5) * 0.5}, ${1 + (y - 0.5) * 0.5}) perspective(${Math.random() * 500 + 500 + 'px'}) rotateX(${(y - 0.5) * 30 + 'deg'}) rotateY(${(x - 0.5) * 30 + 'deg'})`;
+        document.getElementById('triggerAudio').addEventListener('touchstart', (e) => {
+            playAudio();
+            updateImageEffects(e.touches[0].clientX, e.touches[0].clientY);
         }, { passive: true });
 
-        document.addEventListener('touchend', () => {
-            isPlaying = false;
-            image.style.filter = 'none';
-            image.style.transform = 'none';
-        });
+        document.getElementById('triggerAudio').addEventListener('touchmove', (e) => {
+            updateImageEffects(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: true });
+
+        document.getElementById('triggerAudio').addEventListener('touchend', stopAudio);
+
+        function updateImageEffects(clientX, clientY) {
+            // ... (effetti visivi) ...
+        }
     </script>
 </body>
 </html>
