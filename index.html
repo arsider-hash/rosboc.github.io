@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARSIDER | ROSBOC</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <style>
         html, body {
             margin: 0;
@@ -61,6 +60,10 @@
             cursor: pointer;
             margin-top: 20px;
         }
+
+        .soundcloud-player {
+            display: none; /* Nascondi il player di SoundCloud */
+        }
     </style>
 </head>
 <body>
@@ -74,36 +77,20 @@
             La musica generata dipende dalla tua interazione. Attraverso l’interpretabilità del protocollo MIDI, ROSBOC è in grado di tracciare porosità che lavorano su uno slittamento del senso percettivo generando un contatto tra TE e i DATI, tra il tuo profilo acustico esistenziale e la acquisizione reale del virtuale.
         </p>
     </div>
-    <audio id="audio" crossorigin="anonymous"></audio>
-    
+
+    <!-- Player SoundCloud -->
+    <iframe class="soundcloud-player" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1776684379&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe>
+
     <script>
-        let player;
-        let audioStarted = false;
         let image = document.getElementById('image');
-        let description = document.getElementById('description');
 
-        function initAudio() {
-            player = new Tone.Player({
-                url: "https://soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-low-minister-edition",
-                autostart: true, // L'audio parte subito
-                onload: () => {
-                    console.log("Audio caricato!");
-                    player.start();
-                    player.loop = true; // Loop dell'audio
-                    player.playbackRate = 1; // Velocità normale iniziale
-                }
-            }).toDestination();
-        }
-
+        // Gestisce l'interazione con l'immagine
         function handleInteraction(event) {
             const rect = event.currentTarget.getBoundingClientRect();
             const clientX = event.touches ? event.touches[0].clientX : event.clientX;
             const clientY = event.touches ? event.touches[0].clientY : event.clientY;
             const x = (clientX - rect.left) / rect.width;
             const y = (clientY - rect.top) / rect.height;
-
-            // Pitch control: alto = pitch up, basso = pitch down
-            player.playbackRate = 1 + (y - 0.5) * 2; // Pitch varia tra 0.5 e 1.5
 
             // Warping estremo dell'immagine
             const skewX = (x - 0.5) * 50; // Skew orizzontale
@@ -112,13 +99,22 @@
             const scaleY = 1 + Math.abs(y - 0.5) * 2; // Scale verticale
 
             image.style.transform = `skew(${skewX}deg, ${skewY}deg) scale(${scaleX}, ${scaleY})`;
-            image.style.filter = `brightness(${1 + y}) contrast(${1 + x})`;
+            image.style.filter = `blur(${Math.abs(x - 0.5) * 10}px) brightness(${1 + y})`;
         }
 
+        // Ripristina l'immagine quando il mouse/tocco esce
+        function resetImage() {
+            image.style.transform = "none";
+            image.style.filter = "blur(5px)"; // Foto torna normale ma blurrata
+        }
+
+        // Inizializza tutto al caricamento della pagina
         window.onload = () => {
-            initAudio();
-            document.getElementById("triggerAudio").addEventListener("mousemove", handleInteraction);
-            document.getElementById("triggerAudio").addEventListener("touchmove", handleInteraction);
+            const triggerAudio = document.getElementById("triggerAudio");
+            triggerAudio.addEventListener("mousemove", handleInteraction);
+            triggerAudio.addEventListener("touchmove", handleInteraction);
+            triggerAudio.addEventListener("mouseleave", resetImage);
+            triggerAudio.addEventListener("touchend", resetImage);
         };
     </script>
 </body>
