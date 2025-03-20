@@ -6,14 +6,13 @@
     <title>ARSIDER | ROSBOC</title>
     <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
     <style>
-        /* Reset per garantire che la pagina sia sempre scrollabile */
         html, body {
             margin: 0;
             padding: 0;
             width: 100%;
             min-height: 100vh;
             overflow-x: hidden;
-            overflow-y: auto; /* Permette lo scroll verticale */
+            overflow-y: auto;
         }
 
         body {
@@ -34,10 +33,9 @@
         .title {
             font-family: 'UnifrakturMaguntia', cursive;
             font-size: 6em;
-            color: transparent;
+            color: red;
             -webkit-text-stroke: 2px black;
             text-stroke: 2px black;
-            color: red;
             cursor: pointer;
             margin: 50px 0;
             text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
@@ -59,130 +57,43 @@
             cursor: pointer;
             overflow: hidden;
             position: relative;
-            touch-action: none; /* Permette il touch per il morphing */
         }
 
         .image-container img {
             max-width: 100%;
             height: auto;
             border-radius: 3px;
-            transition: filter 0.3s ease, transform 0.3s ease;
-        }
-
-        /* Effetto dinamico di morphing */
-        .image-container:hover img, .image-container:active img {
-            transition: none; /* Disabilita transizioni durante il morphing */
         }
     </style>
 </head>
 <body>
     <div class="arsider-brand">Progetto del gruppo ARSIDER</div>
 
-    <h1 class="title" onclick="breakTitle()">ROSBOC</h1>
+    <h1 class="title">ROSBOC</h1>
 
     <div class="content">
-        <div class="image-container" onclick="startAudio()" ontouchmove="applyMorphEffect(event)" onmousemove="applyMorphEffect(event)">
-            <img id="morph-image" src="https://www.repstatic.it/content/localirep/img/rep-torino/2018/01/09/173945946-93f90b9e-3303-445e-8892-b0f097c73e8f.jpg" alt="Sistema ROSBOC">
+        <div class="image-container" onmouseover="startAudio()" onclick="startAudio()">
+            <img src="https://www.repstatic.it/content/localirep/img/rep-torino/2018/01/09/173945946-93f90b9e-3303-445e-8892-b0f097c73e8f.jpg" alt="Sistema ROSBOC">
         </div>
 
         <p style="font-size: 1.5em; font-weight: bold; cursor: pointer;" 
-           onmouseover="makeCursorBig(this)" 
-           onmouseout="resetCursor(this)" 
            onclick="window.open('https://docs.google.com/document/d/11tJpl_25A9e0FIx2nX-t4q-7qu4K2IfaUH8wHWXjzWE/edit?usp=sharing', '_blank')">
            La musica generata dipende dalla tua interazione. Attraverso l’interpretabilità del protocollo MIDI, ROSBOC è in grado di tracciare porosità che lavorano su uno slittamento del senso percettivo generando un contatto tra TE e i DATI, tra il tuo profilo acustico esistenziale e la acquisizione reale del virtuale.
         </p>
     </div>
 
     <!-- Audio element -->
-    <audio id="audio" src="https://soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-gram-minister-edition" crossorigin="anonymous"></audio>
-
-    <!-- Tone.js library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <audio id="audio" src="https://soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-low-minister-edition" crossorigin="anonymous"></audio>
 
     <script>
-        // Variabili globali
         let audioStarted = false;
-        let player;
-
-        // Inizializza Tone.js e carica l'audio
-        function initAudio() {
-            player = new Tone.Player({
-                url: "https://soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-gram-minister-edition",
-                autostart: false,
-                onload: () => console.log("Audio caricato!"),
-            }).toDestination();
-        }
-
-        // Funzione per avviare l'audio al clic
         function startAudio() {
+            const audio = document.getElementById('audio');
             if (!audioStarted) {
-                Tone.start(); // Avvia il contesto audio
-                player.start(); // Avvia la riproduzione
+                audio.play();
                 audioStarted = true;
-                console.log("Audio avviato!");
             }
         }
-
-        // Funzione per l'effetto di morphing dinamico e controllo audio
-        function applyMorphEffect(event) {
-            const img = document.getElementById('morph-image');
-            const rect = event.currentTarget.getBoundingClientRect();
-            
-            // Gestione eventi touch e mouse
-            const clientX = event.touches ? event.touches[0].clientX : event.clientX;
-            const clientY = event.touches ? event.touches[0].clientY : event.clientY;
-
-            const x = (clientX - rect.left) / rect.width; // Posizione X normalizzata (0-1)
-            const y = (clientY - rect.top) / rect.height; // Posizione Y normalizzata (0-1)
-
-            // Asse X: Cambia il punto di partenza dell'audio
-            if (player && player.loaded) {
-                const duration = player.buffer.duration; // Durata totale dell'audio
-                const startTime = x * duration; // Punto di partenza basato su X
-                player.seek(startTime);
-            }
-
-            // Asse Y: Modifica il pitch/velocità dell'audio
-            if (player && player.loaded) {
-                const playbackRate = 0.5 + y; // Velocità tra 0.5x e 1.5x
-                player.playbackRate = playbackRate;
-            }
-
-            // Effetto di morphing estremo
-            const blurValue = x * 20; // Blur massimo di 20px
-            const warpValue = y * 50; // Warping massimo di 50px
-            const distortion = x * 100; // Distorsione massima di 100px
-            const scale = 1 + y * 0.5; // Scala tra 1x e 1.5x
-
-            img.style.filter = `blur(${blurValue}px) contrast(${150 + y * 50}%)`;
-            img.style.transform = `scale(${scale}) rotate(${warpValue}deg) perspective(500px) rotateX(${distortion}deg) rotateY(${distortion}deg)`;
-        }
-
-        // Funzione per l'effetto "vetro rotto" sul titolo
-        function breakTitle() {
-            const title = document.querySelector('.title');
-            title.classList.add('broken');
-            
-            setTimeout(() => {
-                title.classList.remove('broken');
-            }, 1000);
-        }
-
-        // Funzione per il cursore personalizzato
-        function makeCursorBig(element) {
-            element.style.cursor = "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"40\" height=\"40\" viewBox=\"0 0 40 40\"><circle cx=\"20\" cy=\"20\" r=\"18\" fill=\"none\" stroke=\"%23000\" stroke-width=\"2\"/><path d=\"M20 8v24M8 20h24\" stroke=\"%23000\" stroke-width=\"2\"/></svg>'), auto";
-            element.style.transform = "scale(1.05)";
-        }
-
-        function resetCursor(element) {
-            element.style.cursor = "pointer";
-            element.style.transform = "scale(1)";
-        }
-
-        // Inizializza l'audio al caricamento della pagina
-        window.onload = function() {
-            initAudio();
-        };
     </script>
 </body>
 </html>
