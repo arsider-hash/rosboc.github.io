@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARSIDER | ROSBOC</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <style>
         html, body {
@@ -27,7 +27,7 @@
         }
 
         .title {
-            font-family: 'Press Start 2P', cursive;
+            font-family: 'Orbitron', sans-serif;
             font-size: 4em;
             color: black;
             cursor: pointer;
@@ -75,7 +75,7 @@
 
         function initAudio() {
             player = new Tone.Player({
-                url: "https://soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-gram-minister-edition",
+                url: "https://rosboc_automaton.s3.amazonaws.com/audio.mp3",
                 autostart: false,
                 onload: () => console.log("Audio caricato!")
             }).toDestination();
