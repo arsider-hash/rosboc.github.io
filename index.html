@@ -69,30 +69,6 @@
             transition: filter 0.3s ease, transform 0.3s ease;
         }
 
-        .hidden-player {
-            display: none;
-        }
-
-        /* Pulsante per avviare l'audio su mobile */
-        .audio-button {
-            display: none; /* Nascosto di default */
-            margin: 20px auto;
-            padding: 10px 20px;
-            font-size: 1.2em;
-            background-color: #ff5500;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        /* Mostra il pulsante solo su mobile */
-        @media (max-width: 768px) {
-            .audio-button {
-                display: block;
-            }
-        }
-
         /* Effetto dinamico di morphing */
         .image-container:hover img, .image-container:active img {
             transition: none; /* Disabilita transizioni durante il morphing */
@@ -105,12 +81,9 @@
     <h1 class="title" onclick="breakTitle()">ROSBOC</h1>
 
     <div class="content">
-        <div class="image-container" onmouseover="startAudioOnHover()" onmousemove="applyMorphEffect(event)" ontouchmove="applyMorphEffect(event)">
+        <div class="image-container" onclick="startAudio()" ontouchmove="applyMorphEffect(event)" onmousemove="applyMorphEffect(event)">
             <img id="morph-image" src="https://www.repstatic.it/content/localirep/img/rep-torino/2018/01/09/173945946-93f90b9e-3303-445e-8892-b0f097c73e8f.jpg" alt="Sistema ROSBOC">
         </div>
-
-        <!-- Pulsante per avviare l'audio su mobile -->
-        <button class="audio-button" onclick="startAudioOnHover()">Avvia audio</button>
 
         <p style="font-size: 1.5em; font-weight: bold; cursor: pointer;" 
            onmouseover="makeCursorBig(this)" 
@@ -118,15 +91,73 @@
            onclick="window.open('https://docs.google.com/document/d/11tJpl_25A9e0FIx2nX-t4q-7qu4K2IfaUH8wHWXjzWE/edit?usp=sharing', '_blank')">
            La musica generata dipende dalla tua interazione. Attraverso l’interpretabilità del protocollo MIDI, ROSBOC è in grado di tracciare porosità che lavorano su uno slittamento del senso percettivo generando un contatto tra TE e i DATI, tra il tuo profilo acustico esistenziale e la acquisizione reale del virtuale.
         </p>
-
-        <!-- Player SoundCloud nascosto -->
-        <div class="hidden-player">
-            <iframe id="soundcloud-player" width="100%" height="166" scrolling="no" frameborder="no" 
-                src="https://w.soundcloud.com/player/?url=https://soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-gram-minister-edition&color=%23ff5500&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false"></iframe>
-        </div>
     </div>
 
+    <!-- Audio element -->
+    <audio id="audio" src="https://soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-gram-minister-edition" crossorigin="anonymous"></audio>
+
+    <!-- Tone.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
     <script>
+        // Variabili globali
+        let audioStarted = false;
+        let player;
+
+        // Inizializza Tone.js e carica l'audio
+        function initAudio() {
+            player = new Tone.Player({
+                url: "https://soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-gram-minister-edition",
+                autostart: false,
+                onload: () => console.log("Audio caricato!"),
+            }).toDestination();
+        }
+
+        // Funzione per avviare l'audio al clic
+        function startAudio() {
+            if (!audioStarted) {
+                Tone.start(); // Avvia il contesto audio
+                player.start(); // Avvia la riproduzione
+                audioStarted = true;
+                console.log("Audio avviato!");
+            }
+        }
+
+        // Funzione per l'effetto di morphing dinamico e controllo audio
+        function applyMorphEffect(event) {
+            const img = document.getElementById('morph-image');
+            const rect = event.currentTarget.getBoundingClientRect();
+            
+            // Gestione eventi touch e mouse
+            const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+            const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+
+            const x = (clientX - rect.left) / rect.width; // Posizione X normalizzata (0-1)
+            const y = (clientY - rect.top) / rect.height; // Posizione Y normalizzata (0-1)
+
+            // Asse X: Cambia il punto di partenza dell'audio
+            if (player && player.loaded) {
+                const duration = player.buffer.duration; // Durata totale dell'audio
+                const startTime = x * duration; // Punto di partenza basato su X
+                player.seek(startTime);
+            }
+
+            // Asse Y: Modifica il pitch/velocità dell'audio
+            if (player && player.loaded) {
+                const playbackRate = 0.5 + y; // Velocità tra 0.5x e 1.5x
+                player.playbackRate = playbackRate;
+            }
+
+            // Effetto di morphing estremo
+            const blurValue = x * 20; // Blur massimo di 20px
+            const warpValue = y * 50; // Warping massimo di 50px
+            const distortion = x * 100; // Distorsione massima di 100px
+            const scale = 1 + y * 0.5; // Scala tra 1x e 1.5x
+
+            img.style.filter = `blur(${blurValue}px) contrast(${150 + y * 50}%)`;
+            img.style.transform = `scale(${scale}) rotate(${warpValue}deg) perspective(500px) rotateX(${distortion}deg) rotateY(${distortion}deg)`;
+        }
+
         // Funzione per l'effetto "vetro rotto" sul titolo
         function breakTitle() {
             const title = document.querySelector('.title');
@@ -148,56 +179,10 @@
             element.style.transform = "scale(1)";
         }
 
-        // Flag per controllare se l'audio è già stato avviato
-        let audioStarted = false;
-
-        // Funzione per avviare l'audio al passaggio del mouse o al tocco
-        function startAudioOnHover() {
-            if (!audioStarted) {
-                playRandomAudio();
-                audioStarted = true; // Imposta un flag per evitare riavvii multipli
-            }
-        }
-
-        // Funzione per far partire l'audio da un punto casuale
-        function playRandomAudio() {
-            const player = document.getElementById('soundcloud-player');
-            const widget = SC.Widget(player);
-            const duration = 180; // Durata del brano in secondi (modifica se necessario)
-
-            const randomTime = Math.floor(Math.random() * duration);
-            widget.seekTo(randomTime * 1000); // Imposta il punto di partenza
-            widget.play(); // Avvia la riproduzione
-            console.log("Audio avviato da:", randomTime, "secondi"); // Debug
-        }
-
-        // Funzione per l'effetto di morphing dinamico
-        function applyMorphEffect(event) {
-            const img = document.getElementById('morph-image');
-            const rect = event.currentTarget.getBoundingClientRect();
-            
-            // Gestione eventi touch e mouse
-            const clientX = event.touches ? event.touches[0].clientX : event.clientX;
-            const clientY = event.touches ? event.touches[0].clientY : event.clientY;
-
-            const x = (clientX - rect.left) / rect.width; // Posizione X normalizzata (0-1)
-            const y = (clientY - rect.top) / rect.height; // Posizione Y normalizzata (0-1)
-
-            // Calcola i valori di blur e distorsione
-            const blurValue = x * 20; // Blur massimo di 20px
-            const warpValue = y * 50; // Warping massimo di 50px
-
-            // Applica l'effetto
-            img.style.filter = `blur(${blurValue}px)`;
-            img.style.transform = `scale(${1 + y * 0.5}) rotate(${warpValue}deg)`;
-        }
-
-        // Inizializza SoundCloud Widget API
+        // Inizializza l'audio al caricamento della pagina
         window.onload = function() {
-            const iframe = document.getElementById('soundcloud-player');
-            window.SC.Widget(iframe);
+            initAudio();
         };
     </script>
-    <script src="https://w.soundcloud.com/player/api.js"></script>
 </body>
 </html>
