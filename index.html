@@ -38,18 +38,12 @@
             display: inline-block;
             position: relative;
             overflow: hidden;
-            transition: transform 0.3s ease;
         }
 
         .image-container img {
             max-width: 100%;
             height: auto;
-            transition: transform 0.5s ease, filter 0.5s ease;
-        }
-
-        .image-container:hover img {
-            transform: perspective(800px) rotateY(20deg) rotateX(10deg) scale(1.1);
-            filter: blur(5px) brightness(1.3) contrast(1.2) hue-rotate(15deg);
+            transition: transform 0.1s ease, filter 0.1s ease;
         }
 
         .description {
@@ -61,7 +55,7 @@
 
         #soundcloudWidget {
             position: absolute;
-            top: -1000px; /* Sposta il player fuori dalla vista */
+            top: -1000px;
             left: -1000px;
         }
     </style>
@@ -83,15 +77,48 @@
         src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/rosboc_automaton/rsbk-atm-men-a-a-low-minister-edition&auto_play=true"></iframe>
 
     <script>
-        document.getElementById("triggerAudio").addEventListener("mouseenter", function () {
-            let iframe = document.getElementById("soundcloudWidget");
-            iframe.src = iframe.src; // Ricarica il widget per forzare il play
+        const image = document.querySelector('.image-container img');
+        const soundcloudWidget = document.getElementById('soundcloudWidget');
+        let isPlaying = false;
+
+        document.getElementById('triggerAudio').addEventListener('mouseenter', () => {
+            if (!isPlaying) {
+                soundcloudWidget.src = soundcloudWidget.src;
+                isPlaying = true;
+            }
         });
 
-        // Forza il play su dispositivi mobili (richiede interazione utente iniziale)
-        document.addEventListener('touchstart', function() {
-            let iframe = document.getElementById("soundcloudWidget");
-            iframe.src = iframe.src;
+        document.getElementById('triggerAudio').addEventListener('mouseleave', () => {
+            isPlaying = false;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isPlaying) {
+                const x = e.clientX / window.innerWidth;
+                const y = e.clientY / window.innerHeight;
+
+                const scale = 1 + Math.random() * 0.5;
+                const rotateX = (y - 0.5) * 180;
+                const rotateY = (x - 0.5) * 180;
+                const skewX = (x - 0.5) * 50;
+                const skewY = (y - 0.5) * 50;
+                const blur = Math.random() * 5 + 'px';
+                const brightness = Math.random() * 0.8 + 0.8;
+                const hueRotate = Math.random() * 360 + 'deg';
+
+                image.style.transform = `scale(${scale}) rotateX(${rotateX}deg) rotateY(${rotateY}deg) skew(${skewX}deg, ${skewY}deg)`;
+                image.style.filter = `blur(${blur}) brightness(${brightness}) hue-rotate(${hueRotate})`;
+            } else {
+                image.style.transform = 'none';
+                image.style.filter = 'none';
+            }
+        });
+
+        document.addEventListener('touchstart', () => {
+            if (!isPlaying) {
+                soundcloudWidget.src = soundcloudWidget.src;
+                isPlaying = true;
+            }
         }, { once: true });
     </script>
 </body>
