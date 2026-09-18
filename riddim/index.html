@@ -7,7 +7,7 @@
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icon.svg">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>ARSIDER RIDDIM v5.0.1</title>
+<title>ARSIDER RIDDIM v5.0.2</title>
 <style>
 :root{--bg:#090a0d;--p:#11141a;--p2:#171b24;--t:#f5f7fa;--m:#8b93a3;--a:#d9ff48;--b:#61d9ff;--r:14px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;background:var(--bg);color:var(--t);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
@@ -31,7 +31,7 @@ button{padding:8px 10px}button:active,.active{border-color:var(--a);box-shadow:0
 </head>
 <body>
 <div id="app">
-<header><div class="brand">ARSIDER RIDDIM <span style="font-size:9px;color:#61d9ff">V5.0.1</span></div><div style="display:flex;gap:8px;align-items:center"><button id="linkBtn" style="min-height:30px;padding:4px 8px">LINK</button><div id="peerState" class="status">SOLO</div></div></header>
+<header><div class="brand">ARSIDER RIDDIM <span style="font-size:9px;color:#61d9ff">V5.0.2</span></div><div style="display:flex;gap:8px;align-items:center"><button id="linkBtn" style="min-height:30px;padding:4px 8px">LINK</button><div id="peerState" class="status">SOLO</div></div></header>
 
 <section class="panel top">
 <button id="play" class="primary">PLAY</button>
@@ -255,24 +255,91 @@ $$('.mode').forEach(b=>b.onclick=()=>{
  if(state.phraseBase&&state.mode==='PHRASE'){state.pattern=state.phraseBase;state.phraseBase=null;render()}
  $$('.mode').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.mode=b.dataset.mode;$('#padMode').textContent=state.mode
 });
-$('#hold').onclick=()=>{state.hold=!state.hold;$('#hold').classList.toggle('active',state.hold);if(!state.hold){if(state.mode==='PHRASE'&&state.phraseBase){state.pattern=state.phraseBase;state.phraseBase=null;render()}if(state.mode==='CHOP'&&state.base){state.pattern=state.base;state.base=null;render()}if(!state.pad)A.release()}};
+$('#hold').onclick=e=>{if(e.detail===0||Date.now()-lastTouch>900){state.hold=!state.hold;$('#hold').classList.toggle('active',state.hold);if(!state.hold){if(state.mode==='PHRASE'&&state.phraseBase){state.pattern=state.phraseBase;state.phraseBase=null;render()}if(state.mode==='CHOP'&&state.base){state.pattern=state.base;state.base=null;render()}if(!state.pad)A.release()}}};
 const xy=$('#xy');
-xy.onpointerdown=async e=>{
- if(!(await audioOK()))return;
- xy.setPointerCapture(e.pointerId);
+function touchPoint(e){
+ const t=e.touches&&e.touches[0] ? e.touches[0] : (e.changedTouches&&e.changedTouches[0] ? e.changedTouches[0] : null);
+ return t?{clientX:t.clientX,clientY:t.clientY}:null;
+}
+function startPadAt(x,y){
  state.pad=true;state.repeatNext=0;
  if(state.mode==='PHRASE'){state.phraseStart=state.step;state.phraseBase=clone(state.pattern)}
  if(state.rec){state.gesture=[];state.recStart=performance.now()}
- pad(e)
-};
-xy.onpointermove=e=>{if(state.pad)pad(e)};
-xy.onpointerup=xy.onpointercancel=()=>{
+ pad({clientX:x,clientY:y});
+}
+function movePadAt(x,y){
+ if(state.pad)pad({clientX:x,clientY:y});
+}
+function endPad(){
+ if(!state.pad)return;
  state.pad=false;
  if(state.mode==='CHOP'&&state.base&&!state.hold){state.pattern=state.base;state.base=null;render()}
  if(state.mode==='PHRASE'&&state.phraseBase&&!state.hold){state.pattern=state.phraseBase;state.phraseBase=null;render()}
  if(!state.hold){A.release();$('#cursor').style.display='none'}
  if(state.rec){state.rec=false;$('#rec').classList.remove('active')}
+}
+let lastTouch=0;
+xy.addEventListener('touchstart',async e=>{
+ lastTouch=Date.now();
+ const p=touchPoint(e);if(!p)return;
+ e.preventDefault();
+ if(!(await audioOK()))return;
+ startPadAt(p.clientX,p.clientY);
+},{passive:false});
+xy.addEventListener('touchmove',e=>{
+ const p=touchPoint(e);if(!p)return;
+ e.preventDefault();
+ movePadAt(p.clientX,p.clientY);
+},{passive:false});
+xy.addEventListener('touchend',e=>{e.preventDefault();endPad()},{passive:false});
+xy.addEventListener('touchcancel',e=>{e.preventDefault();endPad()},{passive:false});
+
+xy.onpointerdown=async e=>{
+ if(Date.now()-lastTouch<900)return;
+ if(!(await audioOK()))return;
+ try{xy.setPointerCapture(e.pointerId)}catch(_){}
+ startPadAt(e.clientX,e.clientY);
 };
+xy.onpointermove=e=>{if(Date.now()-lastTouch<900)return;movePadAt(e.clientX,e.clientY)};
+xy.onpointerup=xy.onpointercancel=()=>{if(Date.now()-lastTouch<900)return;endPad()};
+
+
+function touchActivate(selector, fn){
+ $$(selector).forEach(el=>{
+  el.addEventListener('touchend',e=>{
+   e.preventDefault();e.stopPropagation();fn(el,e);
+  },{passive:false});
+ });
+}
+touchActivate('.mode',b=>{
+ if(state.base&&state.mode==='CHOP'){state.pattern=state.base;state.base=null;render()}
+ if(state.phraseBase&&state.mode==='PHRASE'){state.pattern=state.phraseBase;state.phraseBase=null;render()}
+ $$('.mode').forEach(x=>x.classList.remove('active'));
+ b.classList.add('active');state.mode=b.dataset.mode;$('#padMode').textContent=state.mode;
+});
+touchActivate('.target',b=>{
+ $$('.target').forEach(x=>x.classList.remove('activeTarget'));
+ b.classList.add('activeTarget');state.repeatTarget=b.dataset.target;
+});
+touchActivate('[data-loop]',b=>loopPattern(+b.dataset.loop));
+$('#loopOff').addEventListener('touchend',e=>{e.preventDefault();loopPattern(0)},{passive:false});
+$('#hold').addEventListener('touchend',e=>{
+ e.preventDefault();
+ state.hold=!state.hold;$('#hold').classList.toggle('active',state.hold);
+ if(!state.hold){
+  if(state.mode==='PHRASE'&&state.phraseBase){state.pattern=state.phraseBase;state.phraseBase=null;render()}
+  if(state.mode==='CHOP'&&state.base){state.pattern=state.base;state.base=null;render()}
+  if(!state.pad)A.release()
+ }
+},{passive:false});
+$$('[data-p]').forEach(b=>{
+ if(b.dataset.p==='VOID'){
+  b.addEventListener('touchstart',e=>{e.preventDefault();state.void=true;if(state.coupled&&state.connected)sendNet({type:'perf',action:'VOID'})},{passive:false});
+  b.addEventListener('touchend',e=>{e.preventDefault();state.void=false},{passive:false});
+ }else{
+  b.addEventListener('touchend',e=>{e.preventDefault();perf(b.dataset.p);if(state.coupled&&state.connected)sendNet({type:'perf',action:b.dataset.p})},{passive:false});
+ }
+});
 $$('.target').forEach(b=>b.onclick=()=>{$$('.target').forEach(x=>x.classList.remove('activeTarget'));b.classList.add('activeTarget');state.repeatTarget=b.dataset.target});
 $$('[data-loop]').forEach(b=>b.onclick=()=>loopPattern(+b.dataset.loop));
 $('#loopOff').onclick=()=>loopPattern(0);
