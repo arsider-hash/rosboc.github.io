@@ -4,8 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#090a0d">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon.svg">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>ARSIDER RIDDIM</title>
+<title>ARSIDER RIDDIM v4</title>
 <style>
 :root{--bg:#090a0d;--p:#11141a;--p2:#171b24;--t:#f5f7fa;--m:#8b93a3;--a:#d9ff48;--b:#61d9ff;--r:14px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;background:var(--bg);color:var(--t);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
@@ -19,11 +21,11 @@ button{padding:8px 10px}button:active,.active{border-color:var(--a);box-shadow:0
 .engine{display:flex;gap:8px;align-items:center}.engine span{font-size:11px;color:var(--m);font-weight:850}.engine .ok{color:var(--a)}.engine .err{color:#ff5d78}
 .lanes{display:grid;gap:7px}.lane{display:grid;grid-template-columns:74px 1fr;gap:7px;align-items:center}.laneHead{display:flex;flex-direction:column;gap:4px}.laneName{font-weight:950}.sample{font-size:9px;min-height:28px;padding:4px;color:var(--m)}
 .grid{display:grid;grid-template-columns:repeat(16,1fr);gap:3px}.step{height:31px;min-height:0;padding:0;border-radius:5px}.step.on{background:var(--a);border-color:var(--a)}.step.play{box-shadow:0 0 0 2px white inset}
-.modeRow,.gestureRow,.perf{display:flex;gap:6px}.modeRow button,.gestureRow button{flex:1}.xy{height:255px;position:relative;overflow:hidden;border-radius:15px;border:1px solid #35404f;background:radial-gradient(circle at 50% 20%,rgba(217,255,72,.10),transparent 35%),linear-gradient(#181d27,#0a0c10);touch-action:none;margin:7px 0}
+.modeRow,.gestureRow,.perf,.repeatRow,.targetRow{display:flex;gap:6px}.modeRow button,.gestureRow button,.repeatRow button,.targetRow button{flex:1}.xy{height:255px;position:relative;overflow:hidden;border-radius:15px;border:1px solid #35404f;background:radial-gradient(circle at 50% 20%,rgba(217,255,72,.10),transparent 35%),linear-gradient(#181d27,#0a0c10);touch-action:none;margin:7px 0}
 .zones{position:absolute;inset:0;display:grid;grid-template-columns:repeat(6,1fr);pointer-events:none}.zones span{border-right:1px solid rgba(255,255,255,.07);text-align:center;padding-top:9px;color:#727c8f;font-size:9px}
 #cursor{position:absolute;width:46px;height:46px;border:2px solid var(--a);border-radius:50%;transform:translate(-50%,-50%);display:none;box-shadow:0 0 20px rgba(217,255,72,.25)}
 .padTxt{position:absolute;left:0;right:0;bottom:16px;text-align:center;pointer-events:none}.padTxt b{font-size:22px}.padTxt small{display:block;color:var(--m)}
-.perf{display:grid;grid-template-columns:repeat(4,1fr)}.danger{color:#ff8da1;background:#2c1219}.hint{font-size:10px;color:var(--m);line-height:1.35}
+.perf{display:grid;grid-template-columns:repeat(4,1fr)}.repeatBox{display:grid;gap:6px}.miniLabel{font-size:9px;color:var(--m);font-weight:900;letter-spacing:.08em}.target.activeTarget{border-color:var(--b);box-shadow:0 0 0 1px var(--b) inset;color:var(--b)}.danger{color:#ff8da1;background:#2c1219}.hint{font-size:10px;color:var(--m);line-height:1.35}
 @media(max-width:600px){.top{grid-template-columns:1.1fr .7fr 1fr}.top #mutate{grid-column:auto}.lane{grid-template-columns:64px 1fr}.step{height:28px}.xy{height:235px}button{font-size:12px}}
 </style>
 </head>
@@ -55,6 +57,7 @@ button{padding:8px 10px}button:active,.active{border-color:var(--a);box-shadow:0
 <button class="mode active" data-mode="REPEAT">REPEAT</button>
 <button class="mode" data-mode="CHOP">CHOP</button>
 <button class="mode" data-mode="FX">FX</button>
+<button class="mode" data-mode="S&H">S&H</button>
 <button id="hold">HOLD</button>
 </div>
 <div id="xy" class="xy">
@@ -67,19 +70,37 @@ button{padding:8px 10px}button:active,.active{border-color:var(--a);box-shadow:0
 </div>
 </section>
 
+<section class="panel repeatBox">
+  <div class="miniLabel">REPEAT TARGET</div>
+  <div class="targetRow">
+    <button class="target activeTarget" data-target="ALL">ALL</button>
+    <button class="target" data-target="KICK">KICK</button>
+    <button class="target" data-target="SNARE">SNARE</button>
+    <button class="target" data-target="HAT">HAT</button>
+    <button class="target" data-target="PERC">PERC</button>
+  </div>
+  <div class="miniLabel">REPEAT PARTS</div>
+  <div class="repeatRow">
+    <button data-loop="8">LOOP 1/2</button>
+    <button data-loop="4">LOOP 1/4</button>
+    <button data-loop="2">LOOP 1/8</button>
+    <button id="loopOff">OFF</button>
+  </div>
+</section>
+
 <section class="panel perf">
 <button data-p="BREAK">BREAK</button><button data-p="AMEN">AMEN</button><button data-p="CHOP">CHOP</button><button data-p="VOID">VOID</button>
 <button data-p="DROP">DROP</button><button data-p="RUSH">RUSH</button><button data-p="TURN">TURN</button><button id="kill" class="danger">KILL</button>
 </section>
 
-<section class="panel hint">Tap sul nome FACTORY di una voce per caricare un sample tuo. Il pad XY è momentary: dito giù = effetto, dito su = ritorno al riddim.</section>
+<section class="panel hint">Tap sul nome FACTORY di una voce per caricare un sample tuo. Il pad XY è momentary. REPEAT ripete, CHOP spezza blocchi, S&H crea modulazioni a gradini. REPEAT TARGET decide quale voce massacrare.</section>
 </div>
 <input id="file" type="file" accept="audio/*" hidden>
 <script>
 (()=>{'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const lanes=['KICK','SNARE','HAT','PERC'], divs=['1/2','1/4','1/8','1/16','1/32','1/64'];
-const state={bpm:160,playing:false,step:0,next:0,timer:null,family:'DUB',pressure:72,interlock:30,mode:'REPEAT',hold:false,pad:false,x:.5,y:0,pattern:null,base:null,temp:0,repeatLane:'KICK',repeatNext:0,gesture:[],rec:false,recStart:0,graf:null,void:false,drop:0};
+const state={bpm:160,playing:false,step:0,next:0,timer:null,family:'DUB',pressure:72,interlock:30,mode:'REPEAT',hold:false,pad:false,x:.5,y:0,pattern:null,base:null,temp:0,repeatLane:'KICK',repeatNext:0,gesture:[],rec:false,recStart:0,graf:null,void:false,drop:0,repeatTarget:'ALL',loopSize:0,loopBase:null,shCounter:0,shValue:0};
 function blank(){return Object.fromEntries(lanes.map(l=>[l,Array(16).fill(false)]))}
 function euc(n,p,r=0){return Array.from({length:n},(_,i)=>((((i-r+n)%n)*p)%n)<p)}
 function clone(p){return Object.fromEntries(lanes.map(l=>[l,[...p[l]]]))}
@@ -129,22 +150,86 @@ function render(){
 }
 function paint(i){$$('.step.play').forEach(x=>x.classList.remove('play'));if(i>=0)$$('.step[data-i="'+i+'"]').forEach(x=>x.classList.add('play'))}
 function divsec(d){const q=60/state.bpm;return {'1/2':q*2,'1/4':q,'1/8':q/2,'1/16':q/4,'1/32':q/8,'1/64':q/16}[d]}
+function loopPattern(size){
+  if(!size){ if(state.loopBase){state.pattern=state.loopBase;state.loopBase=null;render()} state.loopSize=0; return; }
+  if(!state.loopBase)state.loopBase=clone(state.pattern);
+  const src=state.loopBase, p=blank();
+  lanes.forEach(l=>{
+    for(let i=0;i<16;i++)p[l][i]=src[l][i%size];
+  });
+  state.pattern=p;state.loopSize=size;render();
+}
+function chopLive(){
+  if(!state.base)state.base=clone(state.pattern);
+  const z=Math.floor(state.x*6);
+  const sizes=[8,4,4,2,2,1],size=sizes[z];
+  const src=state.base,p=blank();
+  const intensity=state.y;
+  lanes.forEach(l=>{
+    let block=src[l].slice(0,size);
+    if(intensity>.35 && Math.random()<intensity)block=[...block].reverse();
+    if(intensity>.68 && size>1)block=block.slice(1).concat(block[0]);
+    for(let i=0;i<16;i++)p[l][i]=block[i%size];
+  });
+  state.pattern=p;render();
+}
 function sched(){if(!state.playing)return;while(state.next<A.c.currentTime+.1){const i=state.step,t=state.next;if(i===0){if(state.temp>0&&--state.temp===0&&state.base){state.pattern=state.base;state.base=null;render()}if(state.drop>0)state.drop--}
  if(!state.void&&state.drop===0)lanes.forEach(l=>{if(state.pattern[l][i]){A.hit(l,t,l==='KICK'||l==='SNARE'?1:.88);state.repeatLane=l}});
- if(state.pad&&state.mode==='REPEAT'){const z=Math.floor(state.x*6),end=t+60/state.bpm/4,int=divsec(divs[z]);if(state.repeatNext<t)state.repeatNext=t;while(state.repeatNext<end){A.hit(state.repeatLane,state.repeatNext,.9+state.y*.15,1+state.y*.06);state.repeatNext+=int}}
+ if(state.pad&&state.mode==='REPEAT'){
+   const z=Math.floor(state.x*6),end=t+60/state.bpm/4,int=divsec(divs[z]);
+   if(state.repeatNext<t)state.repeatNext=t;
+   while(state.repeatNext<end){
+     if(state.repeatTarget==='ALL'){
+       lanes.forEach(l=>{if(state.pattern[l][i])A.hit(l,state.repeatNext,.88+state.y*.18,1+state.y*.08)});
+     }else{
+       A.hit(state.repeatTarget,state.repeatNext,.9+state.y*.18,1+state.y*.10);
+     }
+     state.repeatNext+=int;
+   }
+ }
+ if(state.pad&&state.mode==='S&H'){
+   const every=[8,4,2,1,1,1][Math.floor(state.x*6)];
+   if((i%every)===0){
+     state.shValue=Math.random()*state.y;
+     A.fx(state.shValue,'FX',Math.min(.999,.12+state.x*.86));
+   }
+ }
  setTimeout(()=>paint(i),Math.max(0,(t-A.c.currentTime)*1000-5));state.next+=60/state.bpm/4;state.step=(state.step+1)%16}}
 async function play(){if(!(await audioOK()))return;if(state.playing){state.playing=false;clearInterval(state.timer);$('#play').textContent='PLAY';paint(-1);A.release()}else{state.playing=true;state.step=0;state.next=A.c.currentTime+.08;$('#play').textContent='STOP';state.timer=setInterval(sched,25)}}
 function perf(a){if(a==='VOID'){state.void=true;return}if(a==='DROP'){state.drop=1;return}state.base=clone(state.pattern);let p=clone(state.pattern);if(a==='BREAK'){p.HAT=euc(16,11,1);p.PERC=euc(16,9,4)}if(a==='AMEN'){p.KICK=[1,0,0,1,0,0,1,0,1,0,1,0,0,1,0,1].map(Boolean);p.SNARE=[0,0,0,0,1,0,0,1,0,0,0,0,1,0,1,0].map(Boolean);p.HAT=euc(16,12)}if(a==='CHOP')lanes.forEach(l=>p[l]=[...p[l].slice(12),...p[l].slice(0,4),...p[l].slice(8,12),...p[l].slice(4,8)]);if(a==='TURN')lanes.forEach(l=>p[l]=[...p[l]].reverse());if(a==='RUSH'){p.HAT=Array(16).fill(true);p.PERC=euc(16,11,1)}state.pattern=p;state.temp=1;render()}
-function pad(e){const r=$('#xy').getBoundingClientRect(),x=clamp((e.clientX-r.left)/r.width,0,.999),y=clamp(1-(e.clientY-r.top)/r.height,0,1);state.x=x;state.y=y;$('#cursor').style.display='block';$('#cursor').style.left=x*100+'%';$('#cursor').style.top=(1-y)*100+'%';$('#readout').textContent=divs[Math.floor(x*6)]+' • '+Math.round(y*100)+'%';if(state.mode==='FX')A.fx(y,'FX',x);else A.fx(y,'REPEAT',x);if(state.rec){const dur=60/state.bpm*4*1000;state.gesture.push({t:clamp((performance.now()-state.recStart)/dur,0,1),x,y})}}
+function pad(e){const r=$('#xy').getBoundingClientRect(),x=clamp((e.clientX-r.left)/r.width,0,.999),y=clamp(1-(e.clientY-r.top)/r.height,0,1);state.x=x;state.y=y;$('#cursor').style.display='block';$('#cursor').style.left=x*100+'%';$('#cursor').style.top=(1-y)*100+'%';$('#readout').textContent=divs[Math.floor(x*6)]+' • '+Math.round(y*100)+'%';if(state.mode==='FX')A.fx(y,'FX',x);else if(state.mode==='CHOP')chopLive();else if(state.mode==='S&H'){/* scheduler holds stepped values */}else A.fx(y,'REPEAT',x);if(state.rec){const dur=60/state.bpm*4*1000;state.gesture.push({t:clamp((performance.now()-state.recStart)/dur,0,1),x,y})}}
 let pending=null;
 $('#file').onchange=async e=>{const f=e.target.files[0];if(f&&pending){await A.load(pending,f);const b=$('[data-s="'+pending+'"]');if(b)b.textContent=f.name.slice(0,9)}e.target.value=''};
 $('#test').onclick=async()=>{if(await audioOK())A.hit('KICK',A.c.currentTime+.02,1)};
 $('#play').onclick=play;$('#generate').onclick=()=>{state.family=$('#family').value;state.pattern=pattern();render()};$('#mutate').onclick=()=>{for(const l of ['HAT','PERC'])for(let i=0;i<16;i++)if(Math.random()<.12)state.pattern[l][i]=!state.pattern[l][i];render()};
 $('#bpm').onchange=e=>state.bpm=clamp(+e.target.value,50,240);$('#family').onchange=e=>state.family=e.target.value;
 $('#pressure').oninput=e=>{state.pressure=+e.target.value;$('#pv').textContent=state.pressure;A.press(state.pressure/100)};$('#interlock').oninput=e=>{state.interlock=+e.target.value;$('#iv').textContent=state.interlock};
-$$('.mode').forEach(b=>b.onclick=()=>{$$('.mode').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.mode=b.dataset.mode;$('#padMode').textContent=state.mode});
+$('.mode').forEach(b=>b.onclick=()=>{
+  if(state.base&&state.mode==='CHOP'){state.pattern=state.base;state.base=null;render()}
+  $('.mode').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.mode=b.dataset.mode;$('#padMode').textContent=state.mode;
+});
 $('#hold').onclick=()=>{state.hold=!state.hold;$('#hold').classList.toggle('active',state.hold)};
-const xy=$('#xy');xy.onpointerdown=async e=>{if(!(await audioOK()))return;xy.setPointerCapture(e.pointerId);state.pad=true;state.repeatNext=0;if(state.rec){state.gesture=[];state.recStart=performance.now()}pad(e)};xy.onpointermove=e=>{if(state.pad)pad(e)};xy.onpointerup=()=>{state.pad=false;if(!state.hold){A.release();$('#cursor').style.display='none'}if(state.rec){state.rec=false;$('#rec').classList.remove('active')}};
+$('.target').forEach(b=>b.onclick=()=>{
+  $('.target').forEach(x=>x.classList.remove('activeTarget'));
+  b.classList.add('activeTarget');state.repeatTarget=b.dataset.target;
+});
+$('[data-loop]').forEach(b=>b.onclick=()=>loopPattern(+b.dataset.loop));
+$('#loopOff').onclick=()=>loopPattern(0);
+const xy=$('#xy');xy.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
+xy.onpointerdown=e=>{
+  try{xy.setPointerCapture(e.pointerId)}catch(_){}
+  state.pad=true;state.repeatNext=0;
+  if(state.rec){state.gesture=[];state.recStart=performance.now()}
+  const px=e.clientX,py=e.clientY;
+  audioOK().then(ok=>{if(ok&&state.pad)pad({clientX:px,clientY:py})});
+};
+xy.onpointermove=e=>{if(state.pad)pad(e)};
+xy.onpointerup=xy.onpointercancel=()=>{
+  state.pad=false;
+  if(state.mode==='CHOP'&&state.base&&!state.hold){state.pattern=state.base;state.base=null;render()}
+  if(!state.hold){A.release();$('#cursor').style.display='none'}
+  if(state.rec){state.rec=false;$('#rec').classList.remove('active')}
+};
 $('#rec').onclick=()=>{state.rec=!state.rec;$('#rec').classList.toggle('active',state.rec)};function gest(rev=false,speed=1){if(!state.gesture.length)return;let g=rev?[...state.gesture].reverse().map(p=>({...p,t:1-p.t})).sort((a,b)=>a.t-b.t):state.gesture,dur=60/state.bpm*4*1000/speed,start=performance.now();function tick(){const u=(performance.now()-start)/dur;if(u>=1){state.pad=false;if(!state.hold){A.release();$('#cursor').style.display='none'}return}let p=g[0];for(const q of g){if(q.t<=u)p=q;else break}const r=xy.getBoundingClientRect();state.pad=true;pad({clientX:r.left+p.x*r.width,clientY:r.top+(1-p.y)*r.height});requestAnimationFrame(tick)}tick()}
 $('#gplay').onclick=()=>gest(false,1);$('#grev').onclick=()=>gest(true,1);$('#g2').onclick=()=>gest(false,2);
 $$('[data-p]').forEach(b=>{if(b.dataset.p==='VOID'){b.onpointerdown=()=>state.void=true;b.onpointerup=b.onpointercancel=()=>state.void=false}else b.onclick=()=>perf(b.dataset.p)});
