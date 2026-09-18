@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#090a0d">
+<link rel="icon" href="../riddim/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../riddim/icon.svg">
+<link rel="manifest" href="./manifest.webmanifest">
+<title>ARSIDER RIDDIM STABLE</title>
+<style>
+:root{--bg:#090a0d;--p:#11141a;--p2:#171b24;--t:#f5f7fa;--m:#8b93a3;--a:#d9ff48;--b:#61d9ff;--r:14px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;background:var(--bg);color:var(--t);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+#app{max-width:820px;margin:auto;padding:8px 8px calc(20px + env(safe-area-inset-bottom))}
+header{display:flex;justify-content:space-between;align-items:center;padding:6px 2px 10px}.brand{font-weight:950;letter-spacing:.06em}.status{font-size:11px;color:var(--m)}
+.panel{background:linear-gradient(#11151c,#0e1116);border:1px solid #252b36;border-radius:var(--r);padding:9px;margin-bottom:8px}
+button,select,input{font:inherit}button,select{background:var(--p2);color:var(--t);border:1px solid #29303c;border-radius:10px;min-height:42px;font-weight:850}
+button{padding:8px 10px}button:active,.active{border-color:var(--a);box-shadow:0 0 0 1px var(--a) inset}.primary{background:var(--a);color:#090b08;border-color:var(--a)}
+.top{display:grid;grid-template-columns:1.1fr .7fr 1fr 1fr;gap:6px}.bpm{background:#0b0d11;border:1px solid #252b36;border-radius:10px;padding:5px 7px}.bpm small{display:block;color:var(--m);font-size:9px}.bpm input{width:100%;border:0;outline:0;background:transparent;color:#fff;font-size:20px;font-weight:900}
+.masters{display:grid;grid-template-columns:1fr 1fr;gap:10px}.masters label{font-size:10px;font-weight:900;color:var(--m)}.masters b{float:right;color:#fff}input[type=range]{width:100%;accent-color:var(--a)}
+.engine{display:flex;gap:8px;align-items:center}.engine span{font-size:11px;color:var(--m);font-weight:850}.engine .ok{color:var(--a)}.engine .err{color:#ff5d78}
+.lanes{display:grid;gap:7px}.lane{display:grid;grid-template-columns:74px 1fr;gap:7px;align-items:center}.laneHead{display:flex;flex-direction:column;gap:4px}.laneName{font-weight:950}.sample{font-size:9px;min-height:28px;padding:4px;color:var(--m)}
+.grid{display:grid;grid-template-columns:repeat(16,1fr);gap:3px}.step{height:31px;min-height:0;padding:0;border-radius:5px}.step.on{background:var(--a);border-color:var(--a)}.step.play{box-shadow:0 0 0 2px white inset}
+.modeRow,.gestureRow,.perf{display:flex;gap:6px}.modeRow button,.gestureRow button{flex:1}.xy{height:255px;position:relative;overflow:hidden;border-radius:15px;border:1px solid #35404f;background:radial-gradient(circle at 50% 20%,rgba(217,255,72,.10),transparent 35%),linear-gradient(#181d27,#0a0c10);touch-action:none;margin:7px 0}
+.zones{position:absolute;inset:0;display:grid;grid-template-columns:repeat(6,1fr);pointer-events:none}.zones span{border-right:1px solid rgba(255,255,255,.07);text-align:center;padding-top:9px;color:#727c8f;font-size:9px}
+#cursor{position:absolute;width:46px;height:46px;border:2px solid var(--a);border-radius:50%;transform:translate(-50%,-50%);display:none;box-shadow:0 0 20px rgba(217,255,72,.25)}
+.padTxt{position:absolute;left:0;right:0;bottom:16px;text-align:center;pointer-events:none}.padTxt b{font-size:22px}.padTxt small{display:block;color:var(--m)}
+.perf{display:grid;grid-template-columns:repeat(4,1fr)}.danger{color:#ff8da1;background:#2c1219}.hint{font-size:10px;color:var(--m);line-height:1.35}
+@media(max-width:600px){.top{grid-template-columns:1.1fr .7fr 1fr}.top #mutate{grid-column:auto}.lane{grid-template-columns:64px 1fr}.step{height:28px}.xy{height:235px}button{font-size:12px}}
+</style>
+</head>
+<body>
+<div id="app">
+<header><div class="brand">ARSIDER RIDDIM <span style="font-size:9px;color:#61d9ff">STABLE V1</span></div><div id="status" class="status">READY</div></header>
+
+<section class="panel top">
+<button id="play" class="primary">PLAY</button>
+<div class="bpm"><small>BPM</small><input id="bpm" type="number" min="50" max="240" value="160"></div>
+<select id="family"><option>DUB</option><option>HALFSTEP</option><option>BREAK</option><option>STOMP</option><option>AFRO</option></select>
+<button id="generate">GENERATE</button>
+<button id="mutate">MUTATE</button>
+</section>
+
+<section class="panel engine">
+<button id="test" class="primary">TEST KICK</button><span id="engine">TOUCH TEST KICK</span>
+</section>
+
+<section class="panel masters">
+<label>PRESSURE <b id="pv">72</b><input id="pressure" type="range" min="0" max="100" value="72"></label>
+<label>INTERLOCK <b id="iv">30</b><input id="interlock" type="range" min="0" max="100" value="30"></label>
+</section>
+
+<section id="lanes" class="panel lanes"></section>
+
+<section class="panel">
+<div class="modeRow">
+<button class="mode active" data-mode="REPEAT">REPEAT</button>
+<button class="mode" data-mode="CHOP">CHOP</button>
+<button class="mode" data-mode="FX">FX</button>
+<button id="hold">HOLD</button>
+</div>
+<div id="xy" class="xy">
+<div class="zones"><span>1/2</span><span>1/4</span><span>1/8</span><span>1/16</span><span>1/32</span><span>1/64</span></div>
+<div id="cursor"></div>
+<div class="padTxt"><b id="padMode">REPEAT</b><small id="readout">TOUCH</small></div>
+</div>
+<div class="gestureRow">
+<button id="rec">REC GESTURE</button><button id="gplay">PLAY</button><button id="grev">REV</button><button id="g2">×2</button>
+</div>
+</section>
+
+<section class="panel perf">
+<button data-p="BREAK">BREAK</button><button data-p="AMEN">AMEN</button><button data-p="CHOP">CHOP</button><button data-p="VOID">VOID</button>
+<button data-p="DROP">DROP</button><button data-p="RUSH">RUSH</button><button data-p="TURN">TURN</button><button id="kill" class="danger">KILL</button>
+</section>
+
+<section class="panel hint">Tap sul nome FACTORY di una voce per caricare un sample tuo. Il pad XY è momentary: dito giù = effetto, dito su = ritorno al riddim.</section>
+</div>
+<input id="file" type="file" accept="audio/*" hidden>
+<script>
+(()=>{'use strict';
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const lanes=['KICK','SNARE','HAT','PERC'], divs=['1/2','1/4','1/8','1/16','1/32','1/64'];
+const state={bpm:160,playing:false,step:0,next:0,timer:null,family:'DUB',pressure:72,interlock:30,mode:'REPEAT',hold:false,pad:false,x:.5,y:0,pattern:null,base:null,temp:0,repeatLane:'KICK',repeatNext:0,gesture:[],rec:false,recStart:0,graf:null,void:false,drop:0};
+function blank(){return Object.fromEntries(lanes.map(l=>[l,Array(16).fill(false)]))}
+function euc(n,p,r=0){return Array.from({length:n},(_,i)=>((((i-r+n)%n)*p)%n)<p)}
+function clone(p){return Object.fromEntries(lanes.map(l=>[l,[...p[l]]]))}
+function pattern(){
+ const p=blank(),add=(l,a)=>a.forEach(i=>p[l][i]=true),I=state.interlock/100;
+ if(state.family==='DUB'){add('KICK',[0,8]);add('SNARE',[4,12]);add('HAT',[2,6,10,14])}
+ if(state.family==='HALFSTEP'){add('KICK',[0,7,10]);add('SNARE',[8]);add('HAT',[2,6,10,14])}
+ if(state.family==='BREAK'){add('KICK',[0,3,7,10]);add('SNARE',[4,12]);p.HAT=euc(16,10,0)}
+ if(state.family==='STOMP'){add('KICK',[0,4,8,12]);add('SNARE',[4,12]);add('HAT',[2,6,10,14])}
+ if(state.family==='AFRO'){add('KICK',[0,6,10]);add('SNARE',[4,12]);p.HAT=euc(16,5,1);p.PERC=euc(16,7,3)}
+ if(I>.25){const h=euc(16,Math.round(4+I*5),1),q=euc(16,Math.round(4+I*7),3);for(let i=0;i<16;i++){if(h[i]&&Math.random()<I)p.HAT[i]=true;if(q[i]&&Math.random()<I*.9)p.PERC[i]=true}}
+ return p
+}
+class Audio{
+ async init(){
+  if(this.c){if(this.c.state==='suspended')await this.c.resume();return}
+  this.c=new (window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'});
+  this.master=this.c.createGain();this.comp=this.c.createDynamicsCompressor();this.sh=this.c.createWaveShaper();this.f=this.c.createBiquadFilter();
+  this.del=this.c.createDelay(2);this.fb=this.c.createGain();this.wet=this.c.createGain();
+  this.del.delayTime.value=.24;this.fb.gain.value=.24;this.wet.gain.value=0;this.f.type='lowpass';this.f.frequency.value=20000;
+  this.del.connect(this.fb);this.fb.connect(this.del);this.del.connect(this.wet);this.wet.connect(this.comp);
+  this.f.connect(this.sh);this.sh.connect(this.comp);this.comp.connect(this.master);this.master.connect(this.c.destination);
+  this.make();this.press(.72)
+ }
+ curve(k){const a=new Float32Array(2048);for(let i=0;i<a.length;i++){const x=i*2/(a.length-1)-1;a[i]=(1+k)*x/(1+k*Math.abs(x))}return a}
+ press(v){if(!this.c)return;this.sh.curve=this.curve(2+v*8);this.comp.threshold.value=-9-v*14;this.comp.ratio.value=4+v*8;this.comp.attack.value=.003;this.comp.release.value=.1;this.master.gain.value=.78}
+ buf(sec,fn){const n=Math.floor(sec*this.c.sampleRate),b=this.c.createBuffer(1,n,this.c.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=clamp(fn(i/this.c.sampleRate),-1,1);return b}
+ make(){const rnd=()=>Math.random()*2-1;
+  this.b={};
+  this.b.KICK=this.buf(.5,t=>Math.tanh((Math.sin(2*Math.PI*(42+90*Math.exp(-t*20))*t)*Math.exp(-t*7)+rnd()*Math.exp(-t*120)*.2)*3));
+  this.b.SNARE=this.buf(.25,t=>Math.tanh((rnd()*Math.exp(-t*14)+Math.sin(2*Math.PI*185*t)*Math.exp(-t*18)*.45)*2));
+  this.b.HAT=this.buf(.10,t=>Math.tanh((rnd()*.7+Math.sin(2*Math.PI*7200*t)*.3)*Math.exp(-t*40)*2));
+  this.b.PERC=this.buf(.20,t=>Math.tanh((Math.sin(2*Math.PI*430*t+Math.sin(2*Math.PI*210*t)*4)*Math.exp(-t*16)+rnd()*Math.exp(-t*35)*.2)*2))
+ }
+ hit(l,t=this.c.currentTime,v=1,p=1){const b=this.custom?.[l]||this.b[l];if(!b)return;const s=this.c.createBufferSource(),g=this.c.createGain(),send=this.c.createGain();s.buffer=b;s.playbackRate.value=p;g.gain.value=v*(.75+state.pressure/100*.4);send.gain.value=(l==='SNARE'||l==='PERC')?.17:.04;s.connect(g);g.connect(this.f);g.connect(send);send.connect(this.del);s.start(t)}
+ fx(y,mode,x){if(!this.c)return;const n=this.c.currentTime;if(mode==='FX'){const z=Math.floor(x*4);if(z===0){this.f.type='lowpass';this.f.frequency.setTargetAtTime(18000-y*16500,n,.02);this.f.Q.setTargetAtTime(.5+y*16,n,.02)}else if(z===1){this.wet.gain.setTargetAtTime(y*.65,n,.02);this.fb.gain.setTargetAtTime(.2+y*.65,n,.02)}else if(z===2){this.f.type='bandpass';this.f.frequency.setTargetAtTime(400+y*6000,n,.02);this.f.Q.setTargetAtTime(3+y*18,n,.02)}else{this.f.type='lowpass';this.f.frequency.setTargetAtTime(18000-y*14500,n,.02)}}else{this.f.frequency.setTargetAtTime(20000-y*9500,n,.02);this.wet.gain.setTargetAtTime(y*.18,n,.02)}}
+ release(){if(!this.c)return;const n=this.c.currentTime;this.f.type='lowpass';this.f.frequency.setTargetAtTime(20000,n,.04);this.f.Q.setTargetAtTime(.2,n,.04);this.wet.gain.setTargetAtTime(0,n,.04);this.fb.gain.setTargetAtTime(.24,n,.04)}
+ async load(l,f){await this.init();const ab=await f.arrayBuffer();this.custom=this.custom||{};this.custom[l]=await this.c.decodeAudioData(ab.slice(0))}
+}
+const A=new Audio();
+async function audioOK(){try{await A.init();$('#engine').textContent='ENGINE OK';$('#engine').className='ok';return true}catch(e){$('#engine').textContent='ENGINE ERROR';$('#engine').className='err';return false}}
+function render(){
+ const host=$('#lanes');host.innerHTML='';
+ lanes.forEach(l=>{const row=document.createElement('div');row.className='lane';row.innerHTML='<div class="laneHead"><div class="laneName">'+l+'</div><button class="sample" data-s="'+l+'">FACTORY</button></div><div class="grid">'+Array.from({length:16},(_,i)=>'<button class="step '+(state.pattern[l][i]?'on':'')+'" data-l="'+l+'" data-i="'+i+'"></button>').join('')+'</div>';host.appendChild(row)});
+ $$('.step').forEach(b=>b.onclick=()=>{const l=b.dataset.l,i=+b.dataset.i;state.pattern[l][i]=!state.pattern[l][i];b.classList.toggle('on')});
+ $$('[data-s]').forEach(b=>b.onclick=()=>{pending=b.dataset.s;$('#file').click()})
+}
+function paint(i){$$('.step.play').forEach(x=>x.classList.remove('play'));if(i>=0)$$('.step[data-i="'+i+'"]').forEach(x=>x.classList.add('play'))}
+function divsec(d){const q=60/state.bpm;return {'1/2':q*2,'1/4':q,'1/8':q/2,'1/16':q/4,'1/32':q/8,'1/64':q/16}[d]}
+function sched(){if(!state.playing)return;while(state.next<A.c.currentTime+.1){const i=state.step,t=state.next;if(i===0){if(state.temp>0&&--state.temp===0&&state.base){state.pattern=state.base;state.base=null;render()}if(state.drop>0)state.drop--}
+ if(!state.void&&state.drop===0)lanes.forEach(l=>{if(state.pattern[l][i]){A.hit(l,t,l==='KICK'||l==='SNARE'?1:.88);state.repeatLane=l}});
+ if(state.pad&&state.mode==='REPEAT'){const z=Math.floor(state.x*6),end=t+60/state.bpm/4,int=divsec(divs[z]);if(state.repeatNext<t)state.repeatNext=t;while(state.repeatNext<end){A.hit(state.repeatLane,state.repeatNext,.9+state.y*.15,1+state.y*.06);state.repeatNext+=int}}
+ setTimeout(()=>paint(i),Math.max(0,(t-A.c.currentTime)*1000-5));state.next+=60/state.bpm/4;state.step=(state.step+1)%16}}
+async function play(){if(!(await audioOK()))return;if(state.playing){state.playing=false;clearInterval(state.timer);$('#play').textContent='PLAY';paint(-1);A.release()}else{state.playing=true;state.step=0;state.next=A.c.currentTime+.08;$('#play').textContent='STOP';state.timer=setInterval(sched,25)}}
+function perf(a){if(a==='VOID'){state.void=true;return}if(a==='DROP'){state.drop=1;return}state.base=clone(state.pattern);let p=clone(state.pattern);if(a==='BREAK'){p.HAT=euc(16,11,1);p.PERC=euc(16,9,4)}if(a==='AMEN'){p.KICK=[1,0,0,1,0,0,1,0,1,0,1,0,0,1,0,1].map(Boolean);p.SNARE=[0,0,0,0,1,0,0,1,0,0,0,0,1,0,1,0].map(Boolean);p.HAT=euc(16,12)}if(a==='CHOP')lanes.forEach(l=>p[l]=[...p[l].slice(12),...p[l].slice(0,4),...p[l].slice(8,12),...p[l].slice(4,8)]);if(a==='TURN')lanes.forEach(l=>p[l]=[...p[l]].reverse());if(a==='RUSH'){p.HAT=Array(16).fill(true);p.PERC=euc(16,11,1)}state.pattern=p;state.temp=1;render()}
+function pad(e){const r=$('#xy').getBoundingClientRect(),x=clamp((e.clientX-r.left)/r.width,0,.999),y=clamp(1-(e.clientY-r.top)/r.height,0,1);state.x=x;state.y=y;$('#cursor').style.display='block';$('#cursor').style.left=x*100+'%';$('#cursor').style.top=(1-y)*100+'%';$('#readout').textContent=divs[Math.floor(x*6)]+' • '+Math.round(y*100)+'%';if(state.mode==='FX')A.fx(y,'FX',x);else A.fx(y,'REPEAT',x);if(state.rec){const dur=60/state.bpm*4*1000;state.gesture.push({t:clamp((performance.now()-state.recStart)/dur,0,1),x,y})}}
+let pending=null;
+$('#file').onchange=async e=>{const f=e.target.files[0];if(f&&pending){await A.load(pending,f);const b=$('[data-s="'+pending+'"]');if(b)b.textContent=f.name.slice(0,9)}e.target.value=''};
+$('#test').onclick=async()=>{if(await audioOK())A.hit('KICK',A.c.currentTime+.02,1)};
+$('#play').onclick=play;$('#generate').onclick=()=>{state.family=$('#family').value;state.pattern=pattern();render()};$('#mutate').onclick=()=>{for(const l of ['HAT','PERC'])for(let i=0;i<16;i++)if(Math.random()<.12)state.pattern[l][i]=!state.pattern[l][i];render()};
+$('#bpm').onchange=e=>state.bpm=clamp(+e.target.value,50,240);$('#family').onchange=e=>state.family=e.target.value;
+$('#pressure').oninput=e=>{state.pressure=+e.target.value;$('#pv').textContent=state.pressure;A.press(state.pressure/100)};$('#interlock').oninput=e=>{state.interlock=+e.target.value;$('#iv').textContent=state.interlock};
+$$('.mode').forEach(b=>b.onclick=()=>{$$('.mode').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.mode=b.dataset.mode;$('#padMode').textContent=state.mode});
+$('#hold').onclick=()=>{state.hold=!state.hold;$('#hold').classList.toggle('active',state.hold)};
+const xy=$('#xy');xy.onpointerdown=async e=>{if(!(await audioOK()))return;xy.setPointerCapture(e.pointerId);state.pad=true;state.repeatNext=0;if(state.rec){state.gesture=[];state.recStart=performance.now()}pad(e)};xy.onpointermove=e=>{if(state.pad)pad(e)};xy.onpointerup=()=>{state.pad=false;if(!state.hold){A.release();$('#cursor').style.display='none'}if(state.rec){state.rec=false;$('#rec').classList.remove('active')}};
+$('#rec').onclick=()=>{state.rec=!state.rec;$('#rec').classList.toggle('active',state.rec)};function gest(rev=false,speed=1){if(!state.gesture.length)return;let g=rev?[...state.gesture].reverse().map(p=>({...p,t:1-p.t})).sort((a,b)=>a.t-b.t):state.gesture,dur=60/state.bpm*4*1000/speed,start=performance.now();function tick(){const u=(performance.now()-start)/dur;if(u>=1){state.pad=false;if(!state.hold){A.release();$('#cursor').style.display='none'}return}let p=g[0];for(const q of g){if(q.t<=u)p=q;else break}const r=xy.getBoundingClientRect();state.pad=true;pad({clientX:r.left+p.x*r.width,clientY:r.top+(1-p.y)*r.height});requestAnimationFrame(tick)}tick()}
+$('#gplay').onclick=()=>gest(false,1);$('#grev').onclick=()=>gest(true,1);$('#g2').onclick=()=>gest(false,2);
+$$('[data-p]').forEach(b=>{if(b.dataset.p==='VOID'){b.onpointerdown=()=>state.void=true;b.onpointerup=b.onpointercancel=()=>state.void=false}else b.onclick=()=>perf(b.dataset.p)});
+$('#kill').onclick=()=>{state.playing=false;clearInterval(state.timer);$('#play').textContent='PLAY';state.void=false;state.drop=0;A.release();paint(-1)};
+state.pattern=pattern();render();
+
+})();
+</script>
+</body></html>
