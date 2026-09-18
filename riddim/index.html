@@ -7,7 +7,7 @@
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icon.svg">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>ARSIDER RIDDIM v5.0.2</title>
+<title>ARSIDER RIDDIM v5.1</title>
 <style>
 :root{--bg:#090a0d;--p:#11141a;--p2:#171b24;--t:#f5f7fa;--m:#8b93a3;--a:#d9ff48;--b:#61d9ff;--r:14px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;background:var(--bg);color:var(--t);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
@@ -31,7 +31,7 @@ button{padding:8px 10px}button:active,.active{border-color:var(--a);box-shadow:0
 </head>
 <body>
 <div id="app">
-<header><div class="brand">ARSIDER RIDDIM <span style="font-size:9px;color:#61d9ff">V5.0.2</span></div><div style="display:flex;gap:8px;align-items:center"><button id="linkBtn" style="min-height:30px;padding:4px 8px">LINK</button><div id="peerState" class="status">SOLO</div></div></header>
+<header><div class="brand">ARSIDER RIDDIM <span style="font-size:9px;color:#61d9ff">V5.1</span></div><div style="display:flex;gap:8px;align-items:center"><button id="linkBtn" style="min-height:30px;padding:4px 8px">LINK</button><div id="peerState" class="status">SOLO</div></div></header>
 
 <section class="panel top">
 <button id="play" class="primary">PLAY</button>
@@ -57,6 +57,7 @@ button{padding:8px 10px}button:active,.active{border-color:var(--a);box-shadow:0
 <button class="mode active" data-mode="REPEAT">REPEAT</button>
 <button class="mode" data-mode="CHOP">CHOP</button>
 <button class="mode" data-mode="PHRASE">PHRASE</button>
+<button class="mode" data-mode="LOCK">LOCK</button>
 <button class="mode" data-mode="FX">FX</button>
 <button class="mode" data-mode="S&H">S&H</button>
 <button id="hold">HOLD</button>
@@ -74,8 +75,8 @@ button{padding:8px 10px}button:active,.active{border-color:var(--a);box-shadow:0
 <section class="panel repeatBox">
 <div class="miniLabel">REPEAT TARGET</div>
 <div class="targetRow">
-<button class="target activeTarget" data-target="ALL">ALL</button>
-<button class="target" data-target="KICK">KICK</button>
+<button class="target" data-target="ALL">ALL</button>
+<button class="target activeTarget" data-target="KICK">KICK</button>
 <button class="target" data-target="SNARE">SNARE</button>
 <button class="target" data-target="HAT">HAT</button>
 <button class="target" data-target="PERC">PERC</button>
@@ -86,6 +87,10 @@ button{padding:8px 10px}button:active,.active{border-color:var(--a);box-shadow:0
 <button data-loop="4">LOOP 1/4</button>
 <button data-loop="2">LOOP 1/8</button>
 <button id="loopOff">OFF</button>
+</div>
+<div class="repeatRow">
+<button id="crosslock">CROSSLOCK</button>
+<label style="flex:1;font-size:9px;color:var(--m);font-weight:900">DIRT <b id="dv">28</b><input id="dirt" type="range" min="0" max="100" value="28"></label>
 </div>
 </section>
 
@@ -111,7 +116,7 @@ button{padding:8px 10px}button:active,.active{border-color:var(--a);box-shadow:0
 (()=>{'use strict';window.addEventListener('error',e=>{const el=document.getElementById('engine');if(el){el.textContent='JS ERROR: '+(e.message||'UNKNOWN');el.className='err'}});
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const lanes=['KICK','SNARE','HAT','PERC'], divs=['1/2','1/4','1/8','1/16','1/32','1/64'];
-const state={bpm:160,playing:false,step:0,next:0,timer:null,family:'DUB',pressure:72,interlock:30,mode:'REPEAT',hold:false,pad:false,x:.5,y:0,pattern:null,base:null,temp:0,repeatLane:'KICK',repeatNext:0,gesture:[],rec:false,recStart:0,graf:null,void:false,drop:0,repeatTarget:'ALL',loopBase:null,phraseBase:null,phraseStart:0,shValue:0,coupled:false,peer:null,channel:null,role:null,connected:false};
+const state={bpm:160,playing:false,step:0,next:0,timer:null,family:'DUB',pressure:72,interlock:30,mode:'REPEAT',hold:false,pad:false,x:.5,y:0,pattern:null,base:null,temp:0,repeatLane:'KICK',repeatNext:0,gesture:[],rec:false,recStart:0,graf:null,void:false,drop:0,repeatTarget:'KICK',loopBase:null,phraseBase:null,phraseStart:0,lockBase:null,lockStart:0,crosslock:false,dirt:28,repeatCount:0,shValue:0,coupled:false,peer:null,channel:null,role:null,connected:false};
 function blank(){return Object.fromEntries(lanes.map(l=>[l,Array(16).fill(false)]))}
 function euc(n,p,r=0){return Array.from({length:n},(_,i)=>((((i-r+n)%n)*p)%n)<p)}
 function clone(p){return Object.fromEntries(lanes.map(l=>[l,[...p[l]]]))}
@@ -198,13 +203,38 @@ function phraseLive(){
  if(!p.KICK.some(Boolean)){const k=src.KICK.findIndex(Boolean);p.KICK[k>=0?k:0]=true}
  state.pattern=p;render()
 }
+function lockLive(){
+ if(!state.lockBase)state.lockBase=clone(state.pattern);
+ const lens=[1,2,3,4,6,8],len=lens[Math.floor(state.x*6)],src=state.lockBase,p=clone(src),start=state.lockStart%16,y=state.y,l=state.repeatTarget==='ALL'?'KICK':state.repeatTarget;
+ const ph=[];for(let j=0;j<len;j++)ph.push(src[l][(start+j)%16]);
+ for(let i=0;i<16;i++){
+  let j=i%len;
+  if(y>.35&&Math.floor(i/len)%2===1)j=len-1-j;
+  if(y>.7&&len>1)j=(j+Math.floor(i/len))%len;
+  p[l][i]=ph[j];
+ }
+ state.pattern=p;render()
+}
+
 function sched(){if(!state.playing)return;while(state.next<A.c.currentTime+.1){const i=state.step,t=state.next;if(i===0){if(state.temp>0&&--state.temp===0&&state.base){state.pattern=state.base;state.base=null;render()}if(state.drop>0)state.drop--}
  if(!state.void&&state.drop===0)lanes.forEach(l=>{if(state.pattern[l][i]){A.hit(l,t,l==='KICK'||l==='SNARE'?1:.88);state.repeatLane=l}});
  if(state.pad&&state.mode==='REPEAT'){
  const z=Math.floor(state.x*6),end=t+60/state.bpm/4,int=divsec(divs[z]);if(state.repeatNext<t)state.repeatNext=t;
  while(state.repeatNext<end){
-  if(state.repeatTarget==='ALL')lanes.forEach(l=>{if(state.pattern[l][i])A.hit(l,state.repeatNext,.9+state.y*.12,1+state.y*.06)});
-  else A.hit(state.repeatTarget,state.repeatNext,.9+state.y*.15,1+state.y*.08);
+  state.repeatCount++;
+  const dirt=state.dirt/100,amt=state.y*dirt;
+  const ratios=[.75,.875,1,1.125,1.25,1.5];
+  const pitch=Math.random()<amt*.55?ratios[(state.repeatCount+Math.floor(state.y*10))%ratios.length]:(1+state.y*.05);
+  const vel=.88+state.y*.18+(Math.random()-.5)*amt*.18;
+  if(state.repeatTarget==='ALL'){
+   lanes.forEach(l=>{if(state.pattern[l][i])A.hit(l,state.repeatNext,vel,pitch)});
+  }else{
+   A.hit(state.repeatTarget,state.repeatNext,vel,pitch);
+   if(state.crosslock&&state.repeatCount%2===0){
+    const pair={KICK:'PERC',PERC:'KICK',SNARE:'HAT',HAT:'SNARE'}[state.repeatTarget];
+    if(pair)A.hit(pair,state.repeatNext+int*.5,.65+state.y*.16,1+(Math.random()-.5)*amt*.12);
+   }
+  }
   state.repeatNext+=int
  }
 }
@@ -221,6 +251,9 @@ function pad(e){
  if(state.mode==='PHRASE'){
   const lens=[2,3,4,6,8,12],len=lens[Math.floor(x*6)],feel=y<.22?'LOOP':y<.46?'REV':y<.66?'ROT':y<.8?'HOLES':'FRACTURE';
   $('#readout').textContent=len+' STEP • '+feel+' • '+Math.round(y*100)+'%'
+ }else if(state.mode==='LOCK'){
+  const lens=[1,2,3,4,6,8],len=lens[Math.floor(x*6)],feel=y<.35?'LOCK':y<.7?'FLIP':'ROT';
+  $('#readout').textContent=state.repeatTarget+' • '+len+' STEP • '+feel
  }else if(state.mode==='FX'){
   const names=['ACID','DUB','METAL','CRUSH'];$('#readout').textContent=names[Math.min(3,Math.floor(x*4))]+' • '+Math.round(y*100)+'%'
  }else{
@@ -229,6 +262,7 @@ function pad(e){
  if(state.mode==='FX')A.fx(y,'FX',x);
  else if(state.mode==='CHOP')chopLive();
  else if(state.mode==='PHRASE')phraseLive();
+ else if(state.mode==='LOCK')lockLive();
  else if(state.mode==='S&H'){}
  else A.fx(y,'REPEAT',x);
  if(state.rec){const dur=60/state.bpm*4*1000;state.gesture.push({t:clamp((performance.now()-state.recStart)/dur,0,1),x,y})}
@@ -253,9 +287,11 @@ $('#pressure').oninput=e=>{state.pressure=+e.target.value;$('#pv').textContent=s
 $$('.mode').forEach(b=>b.onclick=()=>{
  if(state.base&&state.mode==='CHOP'){state.pattern=state.base;state.base=null;render()}
  if(state.phraseBase&&state.mode==='PHRASE'){state.pattern=state.phraseBase;state.phraseBase=null;render()}
+ if(state.lockBase&&state.mode==='LOCK'){state.pattern=state.lockBase;state.lockBase=null;render()}
  $$('.mode').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.mode=b.dataset.mode;$('#padMode').textContent=state.mode
 });
-$('#hold').onclick=e=>{if(e.detail===0||Date.now()-lastTouch>900){state.hold=!state.hold;$('#hold').classList.toggle('active',state.hold);if(!state.hold){if(state.mode==='PHRASE'&&state.phraseBase){state.pattern=state.phraseBase;state.phraseBase=null;render()}if(state.mode==='CHOP'&&state.base){state.pattern=state.base;state.base=null;render()}if(!state.pad)A.release()}}};
+$('#hold').onclick=e=>{if(e.detail===0||Date.now()-lastTouch>900){state.hold=!state.hold;$('#hold').classList.toggle('active',state.hold);if(!state.hold){if(state.mode==='PHRASE'&&state.phraseBase){state.pattern=state.phraseBase;state.phraseBase=null;render()}if(state.mode==='CHOP'&&state.base){state.pattern=state.base;state.base=null;render()}
+  if(state.mode==='LOCK'&&state.lockBase){state.pattern=state.lockBase;state.lockBase=null;render()}if(!state.pad)A.release()}}};
 const xy=$('#xy');
 function touchPoint(e){
  const t=e.touches&&e.touches[0] ? e.touches[0] : (e.changedTouches&&e.changedTouches[0] ? e.changedTouches[0] : null);
@@ -264,6 +300,7 @@ function touchPoint(e){
 function startPadAt(x,y){
  state.pad=true;state.repeatNext=0;
  if(state.mode==='PHRASE'){state.phraseStart=state.step;state.phraseBase=clone(state.pattern)}
+ if(state.mode==='LOCK'){state.lockStart=state.step;state.lockBase=clone(state.pattern)}
  if(state.rec){state.gesture=[];state.recStart=performance.now()}
  pad({clientX:x,clientY:y});
 }
@@ -275,6 +312,7 @@ function endPad(){
  state.pad=false;
  if(state.mode==='CHOP'&&state.base&&!state.hold){state.pattern=state.base;state.base=null;render()}
  if(state.mode==='PHRASE'&&state.phraseBase&&!state.hold){state.pattern=state.phraseBase;state.phraseBase=null;render()}
+ if(state.mode==='LOCK'&&state.lockBase&&!state.hold){state.pattern=state.lockBase;state.lockBase=null;render()}
  if(!state.hold){A.release();$('#cursor').style.display='none'}
  if(state.rec){state.rec=false;$('#rec').classList.remove('active')}
 }
@@ -323,6 +361,7 @@ touchActivate('.target',b=>{
 });
 touchActivate('[data-loop]',b=>loopPattern(+b.dataset.loop));
 $('#loopOff').addEventListener('touchend',e=>{e.preventDefault();loopPattern(0)},{passive:false});
+$('#crosslock').addEventListener('touchend',e=>{e.preventDefault();state.crosslock=!state.crosslock;$('#crosslock').classList.toggle('active',state.crosslock)},{passive:false});
 $('#hold').addEventListener('touchend',e=>{
  e.preventDefault();
  state.hold=!state.hold;$('#hold').classList.toggle('active',state.hold);
@@ -343,6 +382,8 @@ $$('[data-p]').forEach(b=>{
 $$('.target').forEach(b=>b.onclick=()=>{$$('.target').forEach(x=>x.classList.remove('activeTarget'));b.classList.add('activeTarget');state.repeatTarget=b.dataset.target});
 $$('[data-loop]').forEach(b=>b.onclick=()=>loopPattern(+b.dataset.loop));
 $('#loopOff').onclick=()=>loopPattern(0);
+$('#crosslock').onclick=()=>{state.crosslock=!state.crosslock;$('#crosslock').classList.toggle('active',state.crosslock)};
+$('#dirt').oninput=e=>{state.dirt=+e.target.value;$('#dv').textContent=state.dirt};
 $('#coupled').onchange=e=>state.coupled=e.target.checked;
 $('#linkBtn').onclick=()=>$('#linkModal').style.display='block';
 $('#closeLink').onclick=()=>$('#linkModal').style.display='none';
@@ -353,7 +394,7 @@ $('#shareLink').onclick=async()=>{const text=$('#signalOut').value;if(!text)retu
 $('#rec').onclick=()=>{state.rec=!state.rec;$('#rec').classList.toggle('active',state.rec)};function gest(rev=false,speed=1){if(!state.gesture.length)return;let g=rev?[...state.gesture].reverse().map(p=>({...p,t:1-p.t})).sort((a,b)=>a.t-b.t):state.gesture,dur=60/state.bpm*4*1000/speed,start=performance.now();function tick(){const u=(performance.now()-start)/dur;if(u>=1){state.pad=false;if(!state.hold){A.release();$('#cursor').style.display='none'}return}let p=g[0];for(const q of g){if(q.t<=u)p=q;else break}const r=xy.getBoundingClientRect();state.pad=true;pad({clientX:r.left+p.x*r.width,clientY:r.top+(1-p.y)*r.height});requestAnimationFrame(tick)}tick()}
 $('#gplay').onclick=()=>gest(false,1);$('#grev').onclick=()=>gest(true,1);$('#g2').onclick=()=>gest(false,2);
 $$('[data-p]').forEach(b=>{if(b.dataset.p==='VOID'){b.onpointerdown=()=>{state.void=true;if(state.coupled&&state.connected)sendNet({type:'perf',action:'VOID'})};b.onpointerup=b.onpointercancel=()=>state.void=false}else b.onclick=()=>{perf(b.dataset.p);if(state.coupled&&state.connected)sendNet({type:'perf',action:b.dataset.p})}});
-$('#kill').onclick=()=>{state.playing=false;clearInterval(state.timer);$('#play').textContent='PLAY';state.void=false;state.drop=0;state.base=null;state.phraseBase=null;A.release();paint(-1)};
+$('#kill').onclick=()=>{state.playing=false;clearInterval(state.timer);$('#play').textContent='PLAY';state.void=false;state.drop=0;state.base=null;state.phraseBase=null;state.lockBase=null;A.release();paint(-1)};
 state.pattern=pattern();render();
 
 })();
