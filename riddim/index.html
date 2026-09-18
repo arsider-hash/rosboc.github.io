@@ -353,8 +353,8 @@ function touchActivate(selector, fn){
 }
 touchActivate('.mode',b=>{
  state.livePattern=null;state.latched=false;
- $('.mode').forEach(x=>x.classList.remove('active'));
- b.classList.add('active');state.mode=b.dataset.mode;$('#padMode').textContent=state.mode;
+ document.querySelectorAll('.mode').forEach(x=>x.classList.remove('active'));
+ b.classList.add('active');state.mode=b.dataset.mode;document.querySelector('#padMode').textContent=state.mode;
 });
 touchActivate('.target',b=>{
  $$('.target').forEach(x=>x.classList.remove('activeTarget'));
