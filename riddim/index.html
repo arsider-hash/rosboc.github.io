@@ -7,7 +7,7 @@
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icon.svg">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>ARSIDER RIDDIM v5</title>
+<title>ARSIDER RIDDIM v5.0.1</title>
 <style>
 :root{--bg:#090a0d;--p:#11141a;--p2:#171b24;--t:#f5f7fa;--m:#8b93a3;--a:#d9ff48;--b:#61d9ff;--r:14px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;background:var(--bg);color:var(--t);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
@@ -31,7 +31,7 @@ button{padding:8px 10px}button:active,.active{border-color:var(--a);box-shadow:0
 </head>
 <body>
 <div id="app">
-<header><div class="brand">ARSIDER RIDDIM <span style="font-size:9px;color:#61d9ff">V5</span></div><div style="display:flex;gap:8px;align-items:center"><button id="linkBtn" style="min-height:30px;padding:4px 8px">LINK</button><div id="peerState" class="status">SOLO</div></div></header>
+<header><div class="brand">ARSIDER RIDDIM <span style="font-size:9px;color:#61d9ff">V5.0.1</span></div><div style="display:flex;gap:8px;align-items:center"><button id="linkBtn" style="min-height:30px;padding:4px 8px">LINK</button><div id="peerState" class="status">SOLO</div></div></header>
 
 <section class="panel top">
 <button id="play" class="primary">PLAY</button>
@@ -250,10 +250,10 @@ $('#test').onclick=async()=>{if(await audioOK())A.hit('KICK',A.c.currentTime+.02
 $('#play').onclick=async()=>{const was=state.playing;await play();if(state.connected)sendNet({type:'transport',playing:!was,bpm:state.bpm})};$('#generate').onclick=()=>{state.family=$('#family').value;state.pattern=pattern();render()};$('#mutate').onclick=()=>{for(const l of ['HAT','PERC'])for(let i=0;i<16;i++)if(Math.random()<.12)state.pattern[l][i]=!state.pattern[l][i];render()};
 $('#bpm').onchange=e=>{state.bpm=clamp(+e.target.value,50,240);if(state.connected&&state.role==='host')sendNet({type:'bpm',bpm:state.bpm})};$('#family').onchange=e=>state.family=e.target.value;
 $('#pressure').oninput=e=>{state.pressure=+e.target.value;$('#pv').textContent=state.pressure;A.press(state.pressure/100)};$('#interlock').oninput=e=>{state.interlock=+e.target.value;$('#iv').textContent=state.interlock};
-$('.mode').forEach(b=>b.onclick=()=>{
+$$('.mode').forEach(b=>b.onclick=()=>{
  if(state.base&&state.mode==='CHOP'){state.pattern=state.base;state.base=null;render()}
  if(state.phraseBase&&state.mode==='PHRASE'){state.pattern=state.phraseBase;state.phraseBase=null;render()}
- $('.mode').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.mode=b.dataset.mode;$('#padMode').textContent=state.mode
+ $$('.mode').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.mode=b.dataset.mode;$('#padMode').textContent=state.mode
 });
 $('#hold').onclick=()=>{state.hold=!state.hold;$('#hold').classList.toggle('active',state.hold);if(!state.hold){if(state.mode==='PHRASE'&&state.phraseBase){state.pattern=state.phraseBase;state.phraseBase=null;render()}if(state.mode==='CHOP'&&state.base){state.pattern=state.base;state.base=null;render()}if(!state.pad)A.release()}};
 const xy=$('#xy');
@@ -273,8 +273,8 @@ xy.onpointerup=xy.onpointercancel=()=>{
  if(!state.hold){A.release();$('#cursor').style.display='none'}
  if(state.rec){state.rec=false;$('#rec').classList.remove('active')}
 };
-$('.target').forEach(b=>b.onclick=()=>{$('.target').forEach(x=>x.classList.remove('activeTarget'));b.classList.add('activeTarget');state.repeatTarget=b.dataset.target});
-$('[data-loop]').forEach(b=>b.onclick=()=>loopPattern(+b.dataset.loop));
+$$('.target').forEach(b=>b.onclick=()=>{$$('.target').forEach(x=>x.classList.remove('activeTarget'));b.classList.add('activeTarget');state.repeatTarget=b.dataset.target});
+$$('[data-loop]').forEach(b=>b.onclick=()=>loopPattern(+b.dataset.loop));
 $('#loopOff').onclick=()=>loopPattern(0);
 $('#coupled').onchange=e=>state.coupled=e.target.checked;
 $('#linkBtn').onclick=()=>$('#linkModal').style.display='block';
@@ -285,7 +285,7 @@ $('#applyLink').onclick=applyLink;
 $('#shareLink').onclick=async()=>{const text=$('#signalOut').value;if(!text)return;if(navigator.share){try{await navigator.share({title:'ARSIDER LINK CAPSULE',text});return}catch(_){}}try{await navigator.clipboard.writeText(text);setLinkStatus('CAPSULE COPIED')}catch(_){}};
 $('#rec').onclick=()=>{state.rec=!state.rec;$('#rec').classList.toggle('active',state.rec)};function gest(rev=false,speed=1){if(!state.gesture.length)return;let g=rev?[...state.gesture].reverse().map(p=>({...p,t:1-p.t})).sort((a,b)=>a.t-b.t):state.gesture,dur=60/state.bpm*4*1000/speed,start=performance.now();function tick(){const u=(performance.now()-start)/dur;if(u>=1){state.pad=false;if(!state.hold){A.release();$('#cursor').style.display='none'}return}let p=g[0];for(const q of g){if(q.t<=u)p=q;else break}const r=xy.getBoundingClientRect();state.pad=true;pad({clientX:r.left+p.x*r.width,clientY:r.top+(1-p.y)*r.height});requestAnimationFrame(tick)}tick()}
 $('#gplay').onclick=()=>gest(false,1);$('#grev').onclick=()=>gest(true,1);$('#g2').onclick=()=>gest(false,2);
-$('[data-p]').forEach(b=>{if(b.dataset.p==='VOID'){b.onpointerdown=()=>{state.void=true;if(state.coupled&&state.connected)sendNet({type:'perf',action:'VOID'})};b.onpointerup=b.onpointercancel=()=>state.void=false}else b.onclick=()=>{perf(b.dataset.p);if(state.coupled&&state.connected)sendNet({type:'perf',action:b.dataset.p})}});
+$$('[data-p]').forEach(b=>{if(b.dataset.p==='VOID'){b.onpointerdown=()=>{state.void=true;if(state.coupled&&state.connected)sendNet({type:'perf',action:'VOID'})};b.onpointerup=b.onpointercancel=()=>state.void=false}else b.onclick=()=>{perf(b.dataset.p);if(state.coupled&&state.connected)sendNet({type:'perf',action:b.dataset.p})}});
 $('#kill').onclick=()=>{state.playing=false;clearInterval(state.timer);$('#play').textContent='PLAY';state.void=false;state.drop=0;state.base=null;state.phraseBase=null;A.release();paint(-1)};
 state.pattern=pattern();render();
 
