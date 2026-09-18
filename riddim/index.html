@@ -7,7 +7,7 @@
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icon.svg">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>ARSIDER RIDDIM v6.1</title>
+<title>ARSIDER RIDDIM v6.2</title>
 <style>
 :root{--bg:#090a0d;--p:#11141a;--p2:#171b24;--t:#f5f7fa;--m:#8b93a3;--a:#d9ff48;--b:#61d9ff;--r:14px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;background:var(--bg);color:var(--t);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
@@ -31,7 +31,7 @@ button{padding:8px 10px}button:active,.active{border-color:var(--a);box-shadow:0
 </head>
 <body>
 <div id="app">
-<header><div class="brand">ARSIDER RIDDIM <span style="font-size:9px;color:#61d9ff">V6.1</span></div><div style="display:flex;gap:8px;align-items:center"><button id="linkBtn" style="min-height:30px;padding:4px 8px">LINK</button><div id="peerState" class="status">SOLO</div></div></header>
+<header><div class="brand">ARSIDER RIDDIM <span style="font-size:9px;color:#61d9ff">V6.2</span></div><div style="display:flex;gap:8px;align-items:center"><button id="linkBtn" style="min-height:30px;padding:4px 8px">LINK</button><div id="peerState" class="status">SOLO</div></div></header>
 
 <section class="panel top">
 <button id="play" class="primary">PLAY</button>
@@ -62,7 +62,7 @@ button{padding:8px 10px}button:active,.active{border-color:var(--a);box-shadow:0
 <button class="mode" data-mode="S&H" style="display:none">S&H</button>
 <button id="hold">HOLD</button>
 </div>
-<div id="xy" class="xy">
+<div id="xy" class="xy"><canvas id="padCanvas" aria-label="ARSIDER performance pad"></canvas>
 <div class="zones"><span>1/2</span><span>1/4</span><span>1/8</span><span>1/16</span><span>1/32</span><span>1/64</span></div>
 <div id="cursor"></div>
 <div class="padTxt"><b id="padMode">REPEAT</b><small id="readout">TOUCH</small></div>
@@ -267,7 +267,7 @@ function sched(){if(!state.playing)return;while(state.next<A.c.currentTime+.085)
 async function play(){if(!(await audioOK()))return;if(state.playing){state.playing=false;clearInterval(state.timer);$('#play').textContent='PLAY';paint(-1);A.release()}else{state.playing=true;state.step=0;state.next=A.c.currentTime+.08;$('#play').textContent='STOP';state.timer=setInterval(sched,25)}}
 function perf(a){if(a==='VOID'){state.void=true;return}if(a==='DROP'){state.drop=1;return}state.base=clone(state.pattern);let p=clone(state.pattern);if(a==='BREAK'){p.HAT=euc(16,11,1);p.PERC=euc(16,9,4)}if(a==='AMEN'){p.KICK=[1,0,0,1,0,0,1,0,1,0,1,0,0,1,0,1].map(Boolean);p.SNARE=[0,0,0,0,1,0,0,1,0,0,0,0,1,0,1,0].map(Boolean);p.HAT=euc(16,12)}if(a==='CHOP')lanes.forEach(l=>p[l]=[...p[l].slice(12),...p[l].slice(0,4),...p[l].slice(8,12),...p[l].slice(4,8)]);if(a==='TURN')lanes.forEach(l=>p[l]=[...p[l]].reverse());if(a==='RUSH'){p.HAT=Array(16).fill(true);p.PERC=euc(16,11,1)}state.pattern=p;state.temp=1;render()}
 function pad(e){
- const r=$('#xy').getBoundingClientRect(),x=clamp((e.clientX-r.left)/r.width,0,.999),y=clamp(1-(e.clientY-r.top)/r.height,0,1);
+ const r=$('#padCanvas').getBoundingClientRect(),x=clamp((e.clientX-r.left)/r.width,0,.999),y=clamp(1-(e.clientY-r.top)/r.height,0,1);
  state.x=x;state.y=y;$('#cursor').style.display='block';$('#cursor').style.left=x*100+'%';$('#cursor').style.top=(1-y)*100+'%';
  if(state.mode==='LOCK'){
   const lens=[1,2,3,4,6,8],len=lens[Math.floor(x*6)],feel=y<.38?'LOCK':y<.72?'FLIP':'ROT';
@@ -299,51 +299,49 @@ $('#play').onclick=async()=>{const was=state.playing;await play();if(state.conne
 $('#bpm').onchange=e=>{state.bpm=clamp(+e.target.value,50,240);if(state.connected&&state.role==='host')sendNet({type:'bpm',bpm:state.bpm})};$('#family').onchange=e=>state.family=e.target.value;
 $('#pressure').oninput=e=>{state.pressure=+e.target.value;$('#pv').textContent=state.pressure;A.press(state.pressure/100)};$('#interlock').oninput=e=>{state.interlock=+e.target.value;$('#iv').textContent=state.interlock};
 $$('.mode').forEach(b=>b.onclick=()=>{state.livePattern=null;state.latched=false;$$('.mode').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.mode=b.dataset.mode;$('#padMode').textContent=state.mode});
-$('#hold').onclick=e=>{if(e.detail===0||Date.now()-lastTouch>900){state.hold=!state.hold;$('#hold').classList.toggle('active',state.hold);if(!state.hold){state.latched=false;state.livePattern=null;$('#cursor').style.display='none'}if(!state.hold){if(state.mode==='PHRASE'&&state.phraseBase){state.pattern=state.phraseBase;state.phraseBase=null;render()}if(state.mode==='CHOP'&&state.base){state.pattern=state.base;state.base=null;render()}
+$('#hold').onclick=e=>{{state.hold=!state.hold;$('#hold').classList.toggle('active',state.hold);if(!state.hold){state.latched=false;state.livePattern=null;$('#cursor').style.display='none'}if(!state.hold){if(state.mode==='PHRASE'&&state.phraseBase){state.pattern=state.phraseBase;state.phraseBase=null;render()}if(state.mode==='CHOP'&&state.base){state.pattern=state.base;state.base=null;render()}
   if(state.mode==='LOCK'&&state.lockBase){state.pattern=state.lockBase;state.lockBase=null;render()}
   if((state.mode==='FX'||state.mode==='S&H')&&state.fxBase){state.pattern=state.fxBase;state.fxBase=null;render()}if(!state.pad)A.release()}}};
-const xy=$('#xy');
-function touchPoint(e){
- const t=e.touches&&e.touches[0] ? e.touches[0] : (e.changedTouches&&e.changedTouches[0] ? e.changedTouches[0] : null);
- return t?{clientX:t.clientX,clientY:t.clientY}:null;
+const xy=$('#xy'),padCanvas=$('#padCanvas');
+function sizeCanvas(){
+ const r=padCanvas.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1);
+ const w=Math.max(1,Math.floor(r.width*dpr)),h=Math.max(1,Math.floor(r.height*dpr));
+ if(padCanvas.width!==w||padCanvas.height!==h){padCanvas.width=w;padCanvas.height=h}
+ const g=padCanvas.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,r.width,r.height);
+ g.strokeStyle='rgba(255,255,255,.075)';g.lineWidth=1;
+ for(let i=1;i<6;i++){const x=r.width*i/6;g.beginPath();g.moveTo(x,0);g.lineTo(x,r.height);g.stroke()}
+ g.beginPath();g.moveTo(0,r.height/2);g.lineTo(r.width,r.height/2);g.stroke();
 }
+new ResizeObserver(sizeCanvas).observe(xy);sizeCanvas();
+
 function startPadAt(x,y){
  state.pad=true;state.latched=false;state.repeatNext=0;state.livePattern=null;state.lockStart=state.step;
  pad({clientX:x,clientY:y})
 }
-function movePadAt(x,y){
- if(state.pad)pad({clientX:x,clientY:y});
-}
+function movePadAt(x,y){if(state.pad)pad({clientX:x,clientY:y})}
 function endPad(){
  if(!state.pad)return;
  state.pad=false;
  if(state.hold){state.latched=true}
  else{state.latched=false;state.livePattern=null;$('#cursor').style.display='none';$('#readout').textContent='TOUCH'}
 }
-let lastTouch=0;
-xy.addEventListener('touchstart',async e=>{
- lastTouch=Date.now();
- const p=touchPoint(e);if(!p)return;
- e.preventDefault();
- if(!(await audioOK()))return;
- startPadAt(p.clientX,p.clientY);
-},{passive:false});
-xy.addEventListener('touchmove',e=>{
- const p=touchPoint(e);if(!p)return;
- e.preventDefault();
- movePadAt(p.clientX,p.clientY);
-},{passive:false});
-xy.addEventListener('touchend',e=>{e.preventDefault();endPad()},{passive:false});
-xy.addEventListener('touchcancel',e=>{e.preventDefault();endPad()},{passive:false});
 
-xy.onpointerdown=async e=>{
- if(Date.now()-lastTouch<900)return;
+padCanvas.addEventListener('contextmenu',e=>e.preventDefault(),{passive:false});
+padCanvas.addEventListener('selectstart',e=>e.preventDefault(),{passive:false});
+padCanvas.addEventListener('dragstart',e=>e.preventDefault(),{passive:false});
+padCanvas.addEventListener('pointerdown',async e=>{
+ e.preventDefault();e.stopPropagation();
  if(!(await audioOK()))return;
- try{xy.setPointerCapture(e.pointerId)}catch(_){}
- startPadAt(e.clientX,e.clientY);
-};
-xy.onpointermove=e=>{if(Date.now()-lastTouch<900)return;movePadAt(e.clientX,e.clientY)};
-xy.onpointerup=xy.onpointercancel=()=>{if(Date.now()-lastTouch<900)return;endPad()};
+ try{padCanvas.setPointerCapture(e.pointerId)}catch(_){}
+ startPadAt(e.clientX,e.clientY)
+},{passive:false});
+padCanvas.addEventListener('pointermove',e=>{
+ if(!state.pad)return;e.preventDefault();e.stopPropagation();movePadAt(e.clientX,e.clientY)
+},{passive:false});
+padCanvas.addEventListener('pointerup',e=>{
+ e.preventDefault();e.stopPropagation();try{padCanvas.releasePointerCapture(e.pointerId)}catch(_){}endPad()
+},{passive:false});
+padCanvas.addEventListener('pointercancel',e=>{e.preventDefault();e.stopPropagation();endPad()},{passive:false});
 
 
 function touchActivate(selector, fn){
