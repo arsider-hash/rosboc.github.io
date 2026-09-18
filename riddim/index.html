@@ -7,7 +7,7 @@
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icon.svg">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>ARSIDER RIDDIM v4.2.2</title>
+<title>ARSIDER RIDDIM v5</title>
 <style>
 :root{--bg:#090a0d;--p:#11141a;--p2:#171b24;--t:#f5f7fa;--m:#8b93a3;--a:#d9ff48;--b:#61d9ff;--r:14px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;background:var(--bg);color:var(--t);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
@@ -31,7 +31,7 @@ button{padding:8px 10px}button:active,.active{border-color:var(--a);box-shadow:0
 </head>
 <body>
 <div id="app">
-<header><div class="brand">ARSIDER RIDDIM</div><div style="display:flex;gap:8px;align-items:center"><button id="linkBtn" style="min-height:30px;padding:4px 8px">LINK</button><div id="peerState" class="status">SOLO</div></div></header>
+<header><div class="brand">ARSIDER RIDDIM <span style="font-size:9px;color:#61d9ff">V5</span></div><div style="display:flex;gap:8px;align-items:center"><button id="linkBtn" style="min-height:30px;padding:4px 8px">LINK</button><div id="peerState" class="status">SOLO</div></div></header>
 
 <section class="panel top">
 <button id="play" class="primary">PLAY</button>
@@ -72,21 +72,21 @@ button{padding:8px 10px}button:active,.active{border-color:var(--a);box-shadow:0
 </section>
 
 <section class="panel repeatBox">
-  <div class="miniLabel">REPEAT TARGET</div>
-  <div class="targetRow">
-    <button class="target activeTarget" data-target="ALL">ALL</button>
-    <button class="target" data-target="KICK">KICK</button>
-    <button class="target" data-target="SNARE">SNARE</button>
-    <button class="target" data-target="HAT">HAT</button>
-    <button class="target" data-target="PERC">PERC</button>
-  </div>
-  <div class="miniLabel">REPEAT PARTS</div>
-  <div class="repeatRow">
-    <button data-loop="8">LOOP 1/2</button>
-    <button data-loop="4">LOOP 1/4</button>
-    <button data-loop="2">LOOP 1/8</button>
-    <button id="loopOff">OFF</button>
-  </div>
+<div class="miniLabel">REPEAT TARGET</div>
+<div class="targetRow">
+<button class="target activeTarget" data-target="ALL">ALL</button>
+<button class="target" data-target="KICK">KICK</button>
+<button class="target" data-target="SNARE">SNARE</button>
+<button class="target" data-target="HAT">HAT</button>
+<button class="target" data-target="PERC">PERC</button>
+</div>
+<div class="miniLabel">REPEAT PARTS</div>
+<div class="repeatRow">
+<button data-loop="8">LOOP 1/2</button>
+<button data-loop="4">LOOP 1/4</button>
+<button data-loop="2">LOOP 1/8</button>
+<button id="loopOff">OFF</button>
+</div>
 </section>
 
 <section class="panel perf">
@@ -94,35 +94,24 @@ button{padding:8px 10px}button:active,.active{border-color:var(--a);box-shadow:0
 <button data-p="DROP">DROP</button><button data-p="RUSH">RUSH</button><button data-p="TURN">TURN</button><button id="kill" class="danger">KILL</button>
 </section>
 
-<section class="panel hint"><label style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><input id="coupled" type="checkbox"> COUPLED EVENTS</label>Tap sul nome FACTORY di una voce per caricare un sample tuo. Il pad XY è momentary. REPEAT ripete colpi, CHOP spezza blocchi, PHRASE cattura pezzi del riddim in corsa e li ricicla/reversa/ruota/frattura, S&H crea modulazioni a gradini. REPEAT TARGET decide quale voce massacrare.</section>
+<section class="panel hint"><label style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><input id="coupled" type="checkbox"> COUPLED EVENTS</label>REPEAT = colpi. CHOP = blocchi. PHRASE = pezzi del riddim. S&H = modulazione a gradini. Dito su = ritorno.</section>
 </div>
-
 <div id="linkModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:99;padding:14px;overflow:auto">
-  <div style="max-width:620px;margin:6vh auto;background:#11141a;border:1px solid #303846;border-radius:16px;padding:14px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <b>PHONE ↔ PHONE</b><button id="closeLink">×</button>
-    </div>
-    <div class="hint">Stessa Wi‑Fi. A fa HOST, B fa JOIN. Si scambiano una capsula e poi comunicano direttamente.</div>
-    <div style="display:flex;gap:8px;margin:10px 0">
-      <button id="hostLink" class="primary" style="flex:1">HOST</button>
-      <button id="joinLink" style="flex:1">JOIN</button>
-    </div>
-    <textarea id="signalIn" placeholder="INCOLLA QUI LA CAPSULA DELL'ALTRO TELEFONO" style="width:100%;height:110px;background:#080a0e;color:#d9ff48;border:1px solid #303846;border-radius:10px;padding:8px"></textarea>
-    <div style="display:flex;gap:8px;margin:8px 0">
-      <button id="applyLink" style="flex:1">APPLY</button>
-      <button id="shareLink" style="flex:1">SHARE MY CAPSULE</button>
-    </div>
-    <textarea id="signalOut" readonly placeholder="LA TUA CAPSULA APPARE QUI" style="width:100%;height:110px;background:#080a0e;color:#61d9ff;border:1px solid #303846;border-radius:10px;padding:8px"></textarea>
-    <div id="linkStatus" class="hint" style="margin-top:8px">SOLO</div>
-  </div>
-</div>
-
+<div style="max-width:620px;margin:6vh auto;background:#11141a;border:1px solid #303846;border-radius:16px;padding:14px">
+<div style="display:flex;justify-content:space-between;align-items:center"><b>PHONE ↔ PHONE</b><button id="closeLink">×</button></div>
+<div class="hint" style="margin:8px 0">Stessa Wi‑Fi. A = HOST, B = JOIN.</div>
+<div style="display:flex;gap:8px;margin:8px 0"><button id="hostLink" class="primary" style="flex:1">HOST</button><button id="joinLink" style="flex:1">JOIN</button></div>
+<textarea id="signalIn" placeholder="INCOLLA CAPSULA" style="width:100%;height:95px;background:#080a0e;color:#d9ff48;border:1px solid #303846;border-radius:10px;padding:8px"></textarea>
+<div style="display:flex;gap:8px;margin:8px 0"><button id="applyLink" style="flex:1">APPLY</button><button id="shareLink" style="flex:1">SHARE</button></div>
+<textarea id="signalOut" readonly placeholder="TUA CAPSULA" style="width:100%;height:95px;background:#080a0e;color:#61d9ff;border:1px solid #303846;border-radius:10px;padding:8px"></textarea>
+<div id="linkStatus" class="hint">SOLO</div>
+</div></div>
 <input id="file" type="file" accept="audio/*" hidden>
 <script>
-(()=>{'use strict';
+(()=>{'use strict';window.addEventListener('error',e=>{const el=document.getElementById('engine');if(el){el.textContent='JS ERROR: '+(e.message||'UNKNOWN');el.className='err'}});
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const lanes=['KICK','SNARE','HAT','PERC'], divs=['1/2','1/4','1/8','1/16','1/32','1/64'];
-const state={bpm:160,playing:false,step:0,next:0,timer:null,family:'DUB',pressure:72,interlock:30,mode:'REPEAT',hold:false,pad:false,x:.5,y:0,pattern:null,base:null,temp:0,repeatLane:'KICK',repeatNext:0,gesture:[],rec:false,recStart:0,graf:null,void:false,drop:0,repeatTarget:'ALL',loopSize:0,loopBase:null,shCounter:0,shValue:0,phraseBase:null,phraseStart:0,phraseLen:4,coupled:false,peer:null,channel:null,role:null,connected:false};
+const state={bpm:160,playing:false,step:0,next:0,timer:null,family:'DUB',pressure:72,interlock:30,mode:'REPEAT',hold:false,pad:false,x:.5,y:0,pattern:null,base:null,temp:0,repeatLane:'KICK',repeatNext:0,gesture:[],rec:false,recStart:0,graf:null,void:false,drop:0,repeatTarget:'ALL',loopBase:null,phraseBase:null,phraseStart:0,shValue:0,coupled:false,peer:null,channel:null,role:null,connected:false};
 function blank(){return Object.fromEntries(lanes.map(l=>[l,Array(16).fill(false)]))}
 function euc(n,p,r=0){return Array.from({length:n},(_,i)=>((((i-r+n)%n)*p)%n)<p)}
 function clone(p){return Object.fromEntries(lanes.map(l=>[l,[...p[l]]]))}
@@ -158,44 +147,8 @@ class Audio{
   this.b.PERC=this.buf(.20,t=>Math.tanh((Math.sin(2*Math.PI*430*t+Math.sin(2*Math.PI*210*t)*4)*Math.exp(-t*16)+rnd()*Math.exp(-t*35)*.2)*2))
  }
  hit(l,t=this.c.currentTime,v=1,p=1){const b=this.custom?.[l]||this.b[l];if(!b)return;const s=this.c.createBufferSource(),g=this.c.createGain(),send=this.c.createGain();s.buffer=b;s.playbackRate.value=p;g.gain.value=v*(.75+state.pressure/100*.4);send.gain.value=(l==='SNARE'||l==='PERC')?.17:.04;s.connect(g);g.connect(this.f);g.connect(send);send.connect(this.del);s.start(t)}
- fx(y,mode,x){
-  if(!this.c)return;
-  const n=this.c.currentTime;
-  if(mode==='FX'){
-    const z=Math.min(3,Math.floor(x*4));
-    if(z===0){ // ACID
-      this.f.type='lowpass';
-      this.f.frequency.setTargetAtTime(19000-y*18200,n,.015);
-      this.f.Q.setTargetAtTime(.6+y*24,n,.015);
-      this.wet.gain.setTargetAtTime(y*.10,n,.02);
-      this.sh.curve=this.curve(2+state.pressure/100*8+y*5);
-    }else if(z===1){ // DUB
-      this.f.type='lowpass';
-      this.f.frequency.setTargetAtTime(18000-y*11000,n,.02);
-      this.f.Q.setTargetAtTime(.3+y*4,n,.02);
-      this.del.delayTime.setTargetAtTime(.12+y*.42,n,.02);
-      this.wet.gain.setTargetAtTime(.08+y*.92,n,.015);
-      this.fb.gain.setTargetAtTime(.22+y*.70,n,.02);
-    }else if(z===2){ // METAL
-      this.f.type='bandpass';
-      this.f.frequency.setTargetAtTime(300+y*7600,n,.012);
-      this.f.Q.setTargetAtTime(4+y*26,n,.012);
-      this.del.delayTime.setTargetAtTime(.035+y*.08,n,.015);
-      this.wet.gain.setTargetAtTime(.12+y*.46,n,.02);
-      this.fb.gain.setTargetAtTime(.10+y*.48,n,.02);
-    }else{ // CRUSH
-      this.f.type='lowpass';
-      this.f.frequency.setTargetAtTime(17000-y*15500,n,.012);
-      this.f.Q.setTargetAtTime(.5+y*10,n,.015);
-      this.sh.curve=this.curve(3+state.pressure/100*10+y*24);
-      this.wet.gain.setTargetAtTime(y*.20,n,.02);
-    }
-  }else{
-    this.f.frequency.setTargetAtTime(20000-y*9500,n,.02);
-    this.wet.gain.setTargetAtTime(y*.18,n,.02);
-  }
-}
- release(){if(!this.c)return;const n=this.c.currentTime;this.f.type='lowpass';this.f.frequency.setTargetAtTime(20000,n,.04);this.f.Q.setTargetAtTime(.2,n,.04);this.wet.gain.setTargetAtTime(0,n,.04);this.fb.gain.setTargetAtTime(.24,n,.04);this.del.delayTime.setTargetAtTime(.24,n,.04);this.sh.curve=this.curve(2+state.pressure/100*8)}
+ fx(y,mode,x){if(!this.c)return;const n=this.c.currentTime;if(mode==='FX'){const z=Math.floor(x*4);if(z===0){this.f.type='lowpass';this.f.frequency.setTargetAtTime(18000-y*16500,n,.02);this.f.Q.setTargetAtTime(.5+y*16,n,.02)}else if(z===1){this.wet.gain.setTargetAtTime(y*.65,n,.02);this.fb.gain.setTargetAtTime(.2+y*.65,n,.02)}else if(z===2){this.f.type='bandpass';this.f.frequency.setTargetAtTime(400+y*6000,n,.02);this.f.Q.setTargetAtTime(3+y*18,n,.02)}else{this.f.type='lowpass';this.f.frequency.setTargetAtTime(18000-y*14500,n,.02)}}else{this.f.frequency.setTargetAtTime(20000-y*9500,n,.02);this.wet.gain.setTargetAtTime(y*.18,n,.02)}}
+ release(){if(!this.c)return;const n=this.c.currentTime;this.f.type='lowpass';this.f.frequency.setTargetAtTime(20000,n,.04);this.f.Q.setTargetAtTime(.2,n,.04);this.wet.gain.setTargetAtTime(0,n,.04);this.fb.gain.setTargetAtTime(.24,n,.04)}
  async load(l,f){await this.init();const ab=await f.arrayBuffer();this.custom=this.custom||{};this.custom[l]=await this.c.decodeAudioData(ab.slice(0))}
 }
 const A=new Audio();
@@ -209,255 +162,133 @@ function render(){
 function paint(i){$$('.step.play').forEach(x=>x.classList.remove('play'));if(i>=0)$$('.step[data-i="'+i+'"]').forEach(x=>x.classList.add('play'))}
 function divsec(d){const q=60/state.bpm;return {'1/2':q*2,'1/4':q,'1/8':q/2,'1/16':q/4,'1/32':q/8,'1/64':q/16}[d]}
 function loopPattern(size){
-  if(!size){ if(state.loopBase){state.pattern=state.loopBase;state.loopBase=null;render()} state.loopSize=0; return; }
-  if(!state.loopBase)state.loopBase=clone(state.pattern);
-  const src=state.loopBase, p=blank();
-  lanes.forEach(l=>{
-    for(let i=0;i<16;i++)p[l][i]=src[l][i%size];
-  });
-  state.pattern=p;state.loopSize=size;render();
+ if(!size){if(state.loopBase){state.pattern=state.loopBase;state.loopBase=null;render()}return}
+ if(!state.loopBase)state.loopBase=clone(state.pattern);
+ const src=state.loopBase,p=blank();
+ lanes.forEach(l=>{for(let i=0;i<16;i++)p[l][i]=src[l][i%size]});
+ state.pattern=p;render()
 }
 function chopLive(){
-  if(!state.base)state.base=clone(state.pattern);
-  const z=Math.floor(state.x*6);
-  const sizes=[8,4,4,2,2,1],size=sizes[z];
-  const src=state.base,p=blank();
-  const intensity=state.y;
-  lanes.forEach(l=>{
-    let block=src[l].slice(0,size);
-    if(intensity>.35 && Math.random()<intensity)block=[...block].reverse();
-    if(intensity>.68 && size>1)block=block.slice(1).concat(block[0]);
-    for(let i=0;i<16;i++)p[l][i]=block[i%size];
-  });
-  state.pattern=p;render();
+ if(!state.base)state.base=clone(state.pattern);
+ const sizes=[8,4,4,2,2,1],size=sizes[Math.floor(state.x*6)],src=state.base,p=blank(),y=state.y;
+ lanes.forEach(l=>{
+  let b=src[l].slice(0,size);
+  if(y>.35)b=[...b].reverse();
+  if(y>.7&&size>1)b=b.slice(1).concat(b[0]);
+  for(let i=0;i<16;i++)p[l][i]=b[i%size]
+ });
+ state.pattern=p;render()
 }
 function phraseLive(){
-  if(!state.phraseBase)state.phraseBase=clone(state.pattern);
-  const lens=[2,3,4,6,8,12];
-  const len=lens[Math.floor(state.x*6)];
-  state.phraseLen=len;
-  const src=state.phraseBase, start=state.phraseStart%16, p=blank(), y=state.y;
-
-  lanes.forEach(l=>{
-    const phrase=[];
-    for(let j=0;j<len;j++)phrase.push(src[l][(start+j)%16]);
-
-    for(let i=0;i<16;i++){
-      const cycle=Math.floor(i/len);
-      let j=i%len;
-
-      // exact repetition at the bottom, progressively stranger higher up
-      if(y>.22 && cycle%2===1) j=len-1-j;                    // alternate reverse
-      if(y>.46 && len>2) j=(j+cycle)%len;                   // rotating phrase
-      let v=phrase[j];
-
-      if(y>.66 && (l==='HAT'||l==='PERC')){                 // holes in peripherals
-        const gate=((i*3 + cycle*5 + (l==='PERC'?2:0))%7);
-        if(gate < Math.floor((y-.62)*8)) v=false;
-      }
-      if(y>.80 && l==='HAT'){                               // cross-rhythm fracture
-        const q=(j+2+cycle)%len;
-        v = v || phrase[q];
-      }
-      if(y>.90 && l==='PERC'){
-        const q=(len-1-j+cycle)%len;
-        v = phrase[q];
-      }
-
-      p[l][i]=v;
-    }
-  });
-
-  // core protection: keep at least one low-frequency anchor per bar
-  if(!p.KICK.some(Boolean)){
-    const k=src.KICK.findIndex(Boolean);
-    p.KICK[k>=0?k:0]=true;
+ if(!state.phraseBase)state.phraseBase=clone(state.pattern);
+ const lens=[2,3,4,6,8,12],len=lens[Math.floor(state.x*6)],src=state.phraseBase,start=state.phraseStart%16,p=blank(),y=state.y;
+ lanes.forEach(l=>{
+  const ph=[];for(let j=0;j<len;j++)ph.push(src[l][(start+j)%16]);
+  for(let i=0;i<16;i++){
+   const cyc=Math.floor(i/len);let j=i%len;
+   if(y>.22&&cyc%2===1)j=len-1-j;
+   if(y>.46&&len>2)j=(j+cyc)%len;
+   let v=ph[j];
+   if(y>.68&&(l==='HAT'||l==='PERC')&&((i*3+cyc*5)%7)<Math.floor((y-.62)*8))v=false;
+   if(y>.82&&l==='HAT')v=v||ph[(j+2+cyc)%len];
+   if(y>.92&&l==='PERC')v=ph[(len-1-j+cyc)%len];
+   p[l][i]=v
   }
-  if(!p.SNARE.some(Boolean)){
-    const q=src.SNARE.findIndex(Boolean);
-    if(q>=0)p.SNARE[q]=true;
-  }
-  state.pattern=p;render();
+ });
+ if(!p.KICK.some(Boolean)){const k=src.KICK.findIndex(Boolean);p.KICK[k>=0?k:0]=true}
+ state.pattern=p;render()
 }
 function sched(){if(!state.playing)return;while(state.next<A.c.currentTime+.1){const i=state.step,t=state.next;if(i===0){if(state.temp>0&&--state.temp===0&&state.base){state.pattern=state.base;state.base=null;render()}if(state.drop>0)state.drop--}
  if(!state.void&&state.drop===0)lanes.forEach(l=>{if(state.pattern[l][i]){A.hit(l,t,l==='KICK'||l==='SNARE'?1:.88);state.repeatLane=l}});
  if(state.pad&&state.mode==='REPEAT'){
-   const z=Math.floor(state.x*6),end=t+60/state.bpm/4,int=divsec(divs[z]);
-   if(state.repeatNext<t)state.repeatNext=t;
-   while(state.repeatNext<end){
-     if(state.repeatTarget==='ALL'){
-       lanes.forEach(l=>{if(state.pattern[l][i])A.hit(l,state.repeatNext,.88+state.y*.18,1+state.y*.08)});
-     }else{
-       A.hit(state.repeatTarget,state.repeatNext,.9+state.y*.18,1+state.y*.10);
-     }
-     state.repeatNext+=int;
-   }
+ const z=Math.floor(state.x*6),end=t+60/state.bpm/4,int=divsec(divs[z]);if(state.repeatNext<t)state.repeatNext=t;
+ while(state.repeatNext<end){
+  if(state.repeatTarget==='ALL')lanes.forEach(l=>{if(state.pattern[l][i])A.hit(l,state.repeatNext,.9+state.y*.12,1+state.y*.06)});
+  else A.hit(state.repeatTarget,state.repeatNext,.9+state.y*.15,1+state.y*.08);
+  state.repeatNext+=int
  }
- if(state.pad&&state.mode==='S&H'){
-   const every=[8,4,2,1,1,1][Math.floor(state.x*6)];
-   if((i%every)===0){
-     state.shValue=Math.random()*state.y;
-     A.fx(state.shValue,'FX',Math.min(.999,.12+state.x*.86));
-   }
- }
+}
+if(state.pad&&state.mode==='S&H'){
+ const every=[8,4,2,1,1,1][Math.floor(state.x*6)];
+ if(i%every===0){state.shValue=Math.random()*state.y;A.fx(state.shValue,'FX',Math.min(.999,.12+state.x*.86))}
+}
  setTimeout(()=>paint(i),Math.max(0,(t-A.c.currentTime)*1000-5));state.next+=60/state.bpm/4;state.step=(state.step+1)%16}}
 async function play(){if(!(await audioOK()))return;if(state.playing){state.playing=false;clearInterval(state.timer);$('#play').textContent='PLAY';paint(-1);A.release()}else{state.playing=true;state.step=0;state.next=A.c.currentTime+.08;$('#play').textContent='STOP';state.timer=setInterval(sched,25)}}
 function perf(a){if(a==='VOID'){state.void=true;return}if(a==='DROP'){state.drop=1;return}state.base=clone(state.pattern);let p=clone(state.pattern);if(a==='BREAK'){p.HAT=euc(16,11,1);p.PERC=euc(16,9,4)}if(a==='AMEN'){p.KICK=[1,0,0,1,0,0,1,0,1,0,1,0,0,1,0,1].map(Boolean);p.SNARE=[0,0,0,0,1,0,0,1,0,0,0,0,1,0,1,0].map(Boolean);p.HAT=euc(16,12)}if(a==='CHOP')lanes.forEach(l=>p[l]=[...p[l].slice(12),...p[l].slice(0,4),...p[l].slice(8,12),...p[l].slice(4,8)]);if(a==='TURN')lanes.forEach(l=>p[l]=[...p[l]].reverse());if(a==='RUSH'){p.HAT=Array(16).fill(true);p.PERC=euc(16,11,1)}state.pattern=p;state.temp=1;render()}
-function pad(e){const r=$('#xy').getBoundingClientRect(),x=clamp((e.clientX-r.left)/r.width,0,.999),y=clamp(1-(e.clientY-r.top)/r.height,0,1);state.x=x;state.y=y;$('#cursor').style.display='block';$('#cursor').style.left=x*100+'%';$('#cursor').style.top=(1-y)*100+'%';if(state.mode==='PHRASE'){
-  const lens=[2,3,4,6,8,12],len=lens[Math.floor(x*6)];
-  const feel=y<.22?'LOOP':y<.46?'REV':y<.66?'ROT':y<.80?'HOLES':'FRACTURE';
-  $('#readout').textContent=len+' STEP • '+feel+' • '+Math.round(y*100)+'%';
-}else if(state.mode==='FX'){
-  const names=['ACID','DUB','METAL','CRUSH'];
-  $('#readout').textContent=names[Math.min(3,Math.floor(x*4))]+' • '+Math.round(y*100)+'%';
-}else{
-  $('#readout').textContent=divs[Math.floor(x*6)]+' • '+Math.round(y*100)+'%';
+function pad(e){
+ const r=$('#xy').getBoundingClientRect(),x=clamp((e.clientX-r.left)/r.width,0,.999),y=clamp(1-(e.clientY-r.top)/r.height,0,1);
+ state.x=x;state.y=y;$('#cursor').style.display='block';$('#cursor').style.left=x*100+'%';$('#cursor').style.top=(1-y)*100+'%';
+ if(state.mode==='PHRASE'){
+  const lens=[2,3,4,6,8,12],len=lens[Math.floor(x*6)],feel=y<.22?'LOOP':y<.46?'REV':y<.66?'ROT':y<.8?'HOLES':'FRACTURE';
+  $('#readout').textContent=len+' STEP • '+feel+' • '+Math.round(y*100)+'%'
+ }else if(state.mode==='FX'){
+  const names=['ACID','DUB','METAL','CRUSH'];$('#readout').textContent=names[Math.min(3,Math.floor(x*4))]+' • '+Math.round(y*100)+'%'
+ }else{
+  $('#readout').textContent=divs[Math.floor(x*6)]+' • '+Math.round(y*100)+'%'
+ }
+ if(state.mode==='FX')A.fx(y,'FX',x);
+ else if(state.mode==='CHOP')chopLive();
+ else if(state.mode==='PHRASE')phraseLive();
+ else if(state.mode==='S&H'){}
+ else A.fx(y,'REPEAT',x);
+ if(state.rec){const dur=60/state.bpm*4*1000;state.gesture.push({t:clamp((performance.now()-state.recStart)/dur,0,1),x,y})}
 }
-if(state.mode==='FX')A.fx(y,'FX',x);
-else if(state.mode==='CHOP')chopLive();
-else if(state.mode==='PHRASE')phraseLive();
-else if(state.mode==='S&H'){/* scheduler holds stepped values */}
-else A.fx(y,'REPEAT',x);
-if(state.rec){const dur=60/state.bpm*4*1000;state.gesture.push({t:clamp((performance.now()-state.recStart)/dur,0,1),x,y})}}
-
-async function waitIce(pc){
-  if(pc.iceGatheringState==='complete')return;
-  await new Promise(res=>{
-    const f=()=>{if(pc.iceGatheringState==='complete'){pc.removeEventListener('icegatheringstatechange',f);res()}};
-    pc.addEventListener('icegatheringstatechange',f);
-    setTimeout(res,2500);
-  });
-}
+async function waitIce(pc){if(pc.iceGatheringState==='complete')return;await new Promise(res=>{const f=()=>{if(pc.iceGatheringState==='complete'){pc.removeEventListener('icegatheringstatechange',f);res()}};pc.addEventListener('icegatheringstatechange',f);setTimeout(res,2500)})}
 function caps(desc){return btoa(unescape(encodeURIComponent(JSON.stringify(desc))))}
 function uncaps(txt){return JSON.parse(decodeURIComponent(escape(atob(txt.trim()))))}
-function setLinkStatus(t){
-  $('#linkStatus').textContent=t;
-  $('#peerState').textContent=t==='CONNECTED'?'CONNECTED • 2':t;
-}
-function setupPeer(pc){
-  state.peer=pc;
-  pc.onconnectionstatechange=()=>setLinkStatus(pc.connectionState==='connected'?'CONNECTED':pc.connectionState.toUpperCase());
-  pc.ondatachannel=e=>setupChannel(e.channel);
-}
-function setupChannel(ch){
-  state.channel=ch;
-  ch.onopen=()=>{state.connected=true;setLinkStatus('CONNECTED');if(state.role==='host')sendNet({type:'hello',bpm:state.bpm})};
-  ch.onclose=()=>{state.connected=false;setLinkStatus('DISCONNECTED')};
-  ch.onmessage=e=>{try{handleNet(JSON.parse(e.data))}catch(_){}};
-}
+function setLinkStatus(t){$('#linkStatus').textContent=t;$('#peerState').textContent=t==='CONNECTED'?'CONNECTED • 2':t}
+function setupPeer(pc){state.peer=pc;pc.onconnectionstatechange=()=>setLinkStatus(pc.connectionState==='connected'?'CONNECTED':pc.connectionState.toUpperCase());pc.ondatachannel=e=>setupChannel(e.channel)}
+function setupChannel(ch){state.channel=ch;ch.onopen=()=>{state.connected=true;setLinkStatus('CONNECTED');if(state.role==='host')sendNet({type:'hello',bpm:state.bpm})};ch.onclose=()=>{state.connected=false;setLinkStatus('DISCONNECTED')};ch.onmessage=e=>{try{handleNet(JSON.parse(e.data))}catch(_){}}}
 function sendNet(o){if(state.channel?.readyState==='open')state.channel.send(JSON.stringify(o))}
-function handleNet(m){
-  if(m.type==='hello'||m.type==='bpm'){state.bpm=+m.bpm;$('#bpm').value=state.bpm}
-  if(m.type==='transport'){
-    if(m.playing){
-      state.bpm=+m.bpm;$('#bpm').value=state.bpm;
-      if(!state.playing)play();
-    }else if(state.playing)play();
-  }
-  if(m.type==='perf')perf(m.action);
-}
-async function hostLink(){
-  await audioOK();
-  const pc=new RTCPeerConnection({iceServers:[]});setupPeer(pc);state.role='host';
-  const ch=pc.createDataChannel('arsider',{ordered:true});setupChannel(ch);
-  await pc.setLocalDescription(await pc.createOffer());await waitIce(pc);
-  $('#signalOut').value=caps(pc.localDescription);setLinkStatus('HOST CAPSULE READY');
-}
-async function joinLink(){
-  await audioOK();
-  const pc=new RTCPeerConnection({iceServers:[]});setupPeer(pc);state.role='join';setLinkStatus('JOIN: PASTE HOST CAPSULE');
-}
-async function applyLink(){
-  const txt=$('#signalIn').value.trim();if(!txt)return;
-  const desc=uncaps(txt);
-  if(state.role==='join'){
-    await state.peer.setRemoteDescription(desc);
-    await state.peer.setLocalDescription(await state.peer.createAnswer());
-    await waitIce(state.peer);
-    $('#signalOut').value=caps(state.peer.localDescription);
-    setLinkStatus('ANSWER READY');
-  }else if(state.role==='host'){
-    await state.peer.setRemoteDescription(desc);setLinkStatus('CONNECTING');
-  }
-}
-
+function handleNet(m){if(m.type==='hello'||m.type==='bpm'){state.bpm=+m.bpm;$('#bpm').value=state.bpm}if(m.type==='transport'){if(m.playing){state.bpm=+m.bpm;$('#bpm').value=state.bpm;if(!state.playing)play()}else if(state.playing)play()}if(m.type==='perf')perf(m.action)}
+async function hostLink(){await audioOK();const pc=new RTCPeerConnection({iceServers:[]});setupPeer(pc);state.role='host';const ch=pc.createDataChannel('arsider',{ordered:true});setupChannel(ch);await pc.setLocalDescription(await pc.createOffer());await waitIce(pc);$('#signalOut').value=caps(pc.localDescription);setLinkStatus('HOST CAPSULE READY')}
+async function joinLink(){await audioOK();const pc=new RTCPeerConnection({iceServers:[]});setupPeer(pc);state.role='join';setLinkStatus('JOIN: PASTE HOST CAPSULE')}
+async function applyLink(){const txt=$('#signalIn').value.trim();if(!txt)return;const desc=uncaps(txt);if(state.role==='join'){await state.peer.setRemoteDescription(desc);await state.peer.setLocalDescription(await state.peer.createAnswer());await waitIce(state.peer);$('#signalOut').value=caps(state.peer.localDescription);setLinkStatus('ANSWER READY')}else if(state.role==='host'){await state.peer.setRemoteDescription(desc);setLinkStatus('CONNECTING')}}
 let pending=null;
 $('#file').onchange=async e=>{const f=e.target.files[0];if(f&&pending){await A.load(pending,f);const b=$('[data-s="'+pending+'"]');if(b)b.textContent=f.name.slice(0,9)}e.target.value=''};
 $('#test').onclick=async()=>{if(await audioOK())A.hit('KICK',A.c.currentTime+.02,1)};
-$('#play').onclick=async()=>{
-  const was=state.playing;
-  await play();
-  if(state.connected)sendNet({type:'transport',playing:!was,bpm:state.bpm});
-};$('#generate').onclick=()=>{state.family=$('#family').value;state.pattern=pattern();render()};$('#mutate').onclick=()=>{for(const l of ['HAT','PERC'])for(let i=0;i<16;i++)if(Math.random()<.12)state.pattern[l][i]=!state.pattern[l][i];render()};
+$('#play').onclick=async()=>{const was=state.playing;await play();if(state.connected)sendNet({type:'transport',playing:!was,bpm:state.bpm})};$('#generate').onclick=()=>{state.family=$('#family').value;state.pattern=pattern();render()};$('#mutate').onclick=()=>{for(const l of ['HAT','PERC'])for(let i=0;i<16;i++)if(Math.random()<.12)state.pattern[l][i]=!state.pattern[l][i];render()};
 $('#bpm').onchange=e=>{state.bpm=clamp(+e.target.value,50,240);if(state.connected&&state.role==='host')sendNet({type:'bpm',bpm:state.bpm})};$('#family').onchange=e=>state.family=e.target.value;
 $('#pressure').oninput=e=>{state.pressure=+e.target.value;$('#pv').textContent=state.pressure;A.press(state.pressure/100)};$('#interlock').oninput=e=>{state.interlock=+e.target.value;$('#iv').textContent=state.interlock};
 $('.mode').forEach(b=>b.onclick=()=>{
-  if(state.base&&state.mode==='CHOP'){state.pattern=state.base;state.base=null;render()}
-  if(state.phraseBase&&state.mode==='PHRASE'){state.pattern=state.phraseBase;state.phraseBase=null;render()}
-  $('.mode').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.mode=b.dataset.mode;$('#padMode').textContent=state.mode;
+ if(state.base&&state.mode==='CHOP'){state.pattern=state.base;state.base=null;render()}
+ if(state.phraseBase&&state.mode==='PHRASE'){state.pattern=state.phraseBase;state.phraseBase=null;render()}
+ $('.mode').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.mode=b.dataset.mode;$('#padMode').textContent=state.mode
 });
-$('#hold').onclick=()=>{
-  state.hold=!state.hold;$('#hold').classList.toggle('active',state.hold);
-  if(!state.hold){
-    if(state.mode==='PHRASE'&&state.phraseBase){state.pattern=state.phraseBase;state.phraseBase=null;render()}
-    if(state.mode==='CHOP'&&state.base){state.pattern=state.base;state.base=null;render()}
-    if(!state.pad)A.release();
-  }
-};
-$('.target').forEach(b=>b.onclick=()=>{
-  $('.target').forEach(x=>x.classList.remove('activeTarget'));
-  b.classList.add('activeTarget');state.repeatTarget=b.dataset.target;
-});
-$('[data-loop]').forEach(b=>b.onclick=()=>loopPattern(+b.dataset.loop));
-$('#loopOff').onclick=()=>loopPattern(0);
-const xy=$('#xy');xy.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
-xy.onpointerdown=e=>{
-  try{xy.setPointerCapture(e.pointerId)}catch(_){}
-  state.pad=true;state.repeatNext=0;
-  if(state.mode==='PHRASE'){
-    state.phraseStart=state.step;
-    state.phraseBase=clone(state.pattern);
-  }
-  if(state.rec){state.gesture=[];state.recStart=performance.now()}
-  const px=e.clientX,py=e.clientY;
-  audioOK().then(ok=>{if(ok&&state.pad)pad({clientX:px,clientY:py})});
+$('#hold').onclick=()=>{state.hold=!state.hold;$('#hold').classList.toggle('active',state.hold);if(!state.hold){if(state.mode==='PHRASE'&&state.phraseBase){state.pattern=state.phraseBase;state.phraseBase=null;render()}if(state.mode==='CHOP'&&state.base){state.pattern=state.base;state.base=null;render()}if(!state.pad)A.release()}};
+const xy=$('#xy');
+xy.onpointerdown=async e=>{
+ if(!(await audioOK()))return;
+ xy.setPointerCapture(e.pointerId);
+ state.pad=true;state.repeatNext=0;
+ if(state.mode==='PHRASE'){state.phraseStart=state.step;state.phraseBase=clone(state.pattern)}
+ if(state.rec){state.gesture=[];state.recStart=performance.now()}
+ pad(e)
 };
 xy.onpointermove=e=>{if(state.pad)pad(e)};
 xy.onpointerup=xy.onpointercancel=()=>{
-  state.pad=false;
-  if(state.mode==='CHOP'&&state.base&&!state.hold){state.pattern=state.base;state.base=null;render()}
-  if(state.mode==='PHRASE'&&state.phraseBase&&!state.hold){state.pattern=state.phraseBase;state.phraseBase=null;render()}
-  if(!state.hold){A.release();$('#cursor').style.display='none'}
-  if(state.rec){state.rec=false;$('#rec').classList.remove('active')}
+ state.pad=false;
+ if(state.mode==='CHOP'&&state.base&&!state.hold){state.pattern=state.base;state.base=null;render()}
+ if(state.mode==='PHRASE'&&state.phraseBase&&!state.hold){state.pattern=state.phraseBase;state.phraseBase=null;render()}
+ if(!state.hold){A.release();$('#cursor').style.display='none'}
+ if(state.rec){state.rec=false;$('#rec').classList.remove('active')}
 };
-if(!window.PointerEvent){
-  xy.onmousedown=e=>{state.pad=true;state.repeatNext=0;if(state.mode==='PHRASE'){state.phraseStart=state.step;state.phraseBase=clone(state.pattern)};audioOK().then(ok=>{if(ok&&state.pad)pad(e)})};
-  xy.onmousemove=e=>{if(state.pad)pad(e)};
-  window.addEventListener('mouseup',()=>{if(!state.pad)return;state.pad=false;if(state.mode==='CHOP'&&state.base&&!state.hold){state.pattern=state.base;state.base=null;render()}if(state.mode==='PHRASE'&&state.phraseBase&&!state.hold){state.pattern=state.phraseBase;state.phraseBase=null;render()}if(!state.hold){A.release();$('#cursor').style.display='none'}});
-}
-$('#rec').onclick=()=>{state.rec=!state.rec;$('#rec').classList.toggle('active',state.rec)};function gest(rev=false,speed=1){if(!state.gesture.length)return;let g=rev?[...state.gesture].reverse().map(p=>({...p,t:1-p.t})).sort((a,b)=>a.t-b.t):state.gesture,dur=60/state.bpm*4*1000/speed,start=performance.now();function tick(){const u=(performance.now()-start)/dur;if(u>=1){state.pad=false;if(!state.hold){A.release();$('#cursor').style.display='none'}return}let p=g[0];for(const q of g){if(q.t<=u)p=q;else break}const r=xy.getBoundingClientRect();state.pad=true;pad({clientX:r.left+p.x*r.width,clientY:r.top+(1-p.y)*r.height});requestAnimationFrame(tick)}tick()}
-$('#gplay').onclick=()=>gest(false,1);$('#grev').onclick=()=>gest(true,1);$('#g2').onclick=()=>gest(false,2);
-$('[data-p]').forEach(b=>{
-  if(b.dataset.p==='VOID'){
-    b.onpointerdown=()=>{state.void=true;if(state.coupled&&state.connected)sendNet({type:'perf',action:'VOID'})};
-    b.onpointerup=b.onpointercancel=()=>state.void=false;
-  }else b.onclick=()=>{perf(b.dataset.p);if(state.coupled&&state.connected)sendNet({type:'perf',action:b.dataset.p})}
-});
-$('#kill').onclick=()=>{state.playing=false;clearInterval(state.timer);$('#play').textContent='PLAY';state.void=false;state.drop=0;state.phraseBase=null;state.base=null;A.release();paint(-1)};
+$('.target').forEach(b=>b.onclick=()=>{$('.target').forEach(x=>x.classList.remove('activeTarget'));b.classList.add('activeTarget');state.repeatTarget=b.dataset.target});
+$('[data-loop]').forEach(b=>b.onclick=()=>loopPattern(+b.dataset.loop));
+$('#loopOff').onclick=()=>loopPattern(0);
 $('#coupled').onchange=e=>state.coupled=e.target.checked;
 $('#linkBtn').onclick=()=>$('#linkModal').style.display='block';
 $('#closeLink').onclick=()=>$('#linkModal').style.display='none';
 $('#hostLink').onclick=hostLink;
 $('#joinLink').onclick=joinLink;
 $('#applyLink').onclick=applyLink;
-$('#shareLink').onclick=async()=>{
-  const text=$('#signalOut').value;if(!text)return;
-  if(navigator.share){try{await navigator.share({title:'ARSIDER LINK CAPSULE',text});return}catch(_){}}
-  try{await navigator.clipboard.writeText(text);setLinkStatus('CAPSULE COPIED')}catch(_){}
-};
-
+$('#shareLink').onclick=async()=>{const text=$('#signalOut').value;if(!text)return;if(navigator.share){try{await navigator.share({title:'ARSIDER LINK CAPSULE',text});return}catch(_){}}try{await navigator.clipboard.writeText(text);setLinkStatus('CAPSULE COPIED')}catch(_){}};
+$('#rec').onclick=()=>{state.rec=!state.rec;$('#rec').classList.toggle('active',state.rec)};function gest(rev=false,speed=1){if(!state.gesture.length)return;let g=rev?[...state.gesture].reverse().map(p=>({...p,t:1-p.t})).sort((a,b)=>a.t-b.t):state.gesture,dur=60/state.bpm*4*1000/speed,start=performance.now();function tick(){const u=(performance.now()-start)/dur;if(u>=1){state.pad=false;if(!state.hold){A.release();$('#cursor').style.display='none'}return}let p=g[0];for(const q of g){if(q.t<=u)p=q;else break}const r=xy.getBoundingClientRect();state.pad=true;pad({clientX:r.left+p.x*r.width,clientY:r.top+(1-p.y)*r.height});requestAnimationFrame(tick)}tick()}
+$('#gplay').onclick=()=>gest(false,1);$('#grev').onclick=()=>gest(true,1);$('#g2').onclick=()=>gest(false,2);
+$('[data-p]').forEach(b=>{if(b.dataset.p==='VOID'){b.onpointerdown=()=>{state.void=true;if(state.coupled&&state.connected)sendNet({type:'perf',action:'VOID'})};b.onpointerup=b.onpointercancel=()=>state.void=false}else b.onclick=()=>{perf(b.dataset.p);if(state.coupled&&state.connected)sendNet({type:'perf',action:b.dataset.p})}});
+$('#kill').onclick=()=>{state.playing=false;clearInterval(state.timer);$('#play').textContent='PLAY';state.void=false;state.drop=0;state.base=null;state.phraseBase=null;A.release();paint(-1)};
 state.pattern=pattern();render();
-if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+
 })();
 </script>
 </body></html>
