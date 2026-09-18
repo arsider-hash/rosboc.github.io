@@ -1,0 +1,10 @@
+{
+  "appId": "org.arsider.riddim",
+  "appName": "ARSIDER RIDDIM",
+  "webDir": "../riddim",
+  "bundledWebRuntime": false,
+  "android": {
+    "backgroundColor": "#090a0d",
+    "allowMixedContent": false
+  }
+}
