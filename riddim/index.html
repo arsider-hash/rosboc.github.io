@@ -7,7 +7,7 @@
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icon.svg">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>ARSIDER RIDDIM v4.2.1</title>
+<title>ARSIDER RIDDIM v4.2.2</title>
 <style>
 :root{--bg:#090a0d;--p:#11141a;--p2:#171b24;--t:#f5f7fa;--m:#8b93a3;--a:#d9ff48;--b:#61d9ff;--r:14px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;background:var(--bg);color:var(--t);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
@@ -158,8 +158,44 @@ class Audio{
   this.b.PERC=this.buf(.20,t=>Math.tanh((Math.sin(2*Math.PI*430*t+Math.sin(2*Math.PI*210*t)*4)*Math.exp(-t*16)+rnd()*Math.exp(-t*35)*.2)*2))
  }
  hit(l,t=this.c.currentTime,v=1,p=1){const b=this.custom?.[l]||this.b[l];if(!b)return;const s=this.c.createBufferSource(),g=this.c.createGain(),send=this.c.createGain();s.buffer=b;s.playbackRate.value=p;g.gain.value=v*(.75+state.pressure/100*.4);send.gain.value=(l==='SNARE'||l==='PERC')?.17:.04;s.connect(g);g.connect(this.f);g.connect(send);send.connect(this.del);s.start(t)}
- fx(y,mode,x){if(!this.c)return;const n=this.c.currentTime;if(mode==='FX'){const z=Math.floor(x*4);if(z===0){this.f.type='lowpass';this.f.frequency.setTargetAtTime(18000-y*16500,n,.02);this.f.Q.setTargetAtTime(.5+y*16,n,.02)}else if(z===1){this.wet.gain.setTargetAtTime(y*.65,n,.02);this.fb.gain.setTargetAtTime(.2+y*.65,n,.02)}else if(z===2){this.f.type='bandpass';this.f.frequency.setTargetAtTime(400+y*6000,n,.02);this.f.Q.setTargetAtTime(3+y*18,n,.02)}else{this.f.type='lowpass';this.f.frequency.setTargetAtTime(18000-y*14500,n,.02)}}else{this.f.frequency.setTargetAtTime(20000-y*9500,n,.02);this.wet.gain.setTargetAtTime(y*.18,n,.02)}}
- release(){if(!this.c)return;const n=this.c.currentTime;this.f.type='lowpass';this.f.frequency.setTargetAtTime(20000,n,.04);this.f.Q.setTargetAtTime(.2,n,.04);this.wet.gain.setTargetAtTime(0,n,.04);this.fb.gain.setTargetAtTime(.24,n,.04)}
+ fx(y,mode,x){
+  if(!this.c)return;
+  const n=this.c.currentTime;
+  if(mode==='FX'){
+    const z=Math.min(3,Math.floor(x*4));
+    if(z===0){ // ACID
+      this.f.type='lowpass';
+      this.f.frequency.setTargetAtTime(19000-y*18200,n,.015);
+      this.f.Q.setTargetAtTime(.6+y*24,n,.015);
+      this.wet.gain.setTargetAtTime(y*.10,n,.02);
+      this.sh.curve=this.curve(2+state.pressure/100*8+y*5);
+    }else if(z===1){ // DUB
+      this.f.type='lowpass';
+      this.f.frequency.setTargetAtTime(18000-y*11000,n,.02);
+      this.f.Q.setTargetAtTime(.3+y*4,n,.02);
+      this.del.delayTime.setTargetAtTime(.12+y*.42,n,.02);
+      this.wet.gain.setTargetAtTime(.08+y*.92,n,.015);
+      this.fb.gain.setTargetAtTime(.22+y*.70,n,.02);
+    }else if(z===2){ // METAL
+      this.f.type='bandpass';
+      this.f.frequency.setTargetAtTime(300+y*7600,n,.012);
+      this.f.Q.setTargetAtTime(4+y*26,n,.012);
+      this.del.delayTime.setTargetAtTime(.035+y*.08,n,.015);
+      this.wet.gain.setTargetAtTime(.12+y*.46,n,.02);
+      this.fb.gain.setTargetAtTime(.10+y*.48,n,.02);
+    }else{ // CRUSH
+      this.f.type='lowpass';
+      this.f.frequency.setTargetAtTime(17000-y*15500,n,.012);
+      this.f.Q.setTargetAtTime(.5+y*10,n,.015);
+      this.sh.curve=this.curve(3+state.pressure/100*10+y*24);
+      this.wet.gain.setTargetAtTime(y*.20,n,.02);
+    }
+  }else{
+    this.f.frequency.setTargetAtTime(20000-y*9500,n,.02);
+    this.wet.gain.setTargetAtTime(y*.18,n,.02);
+  }
+}
+ release(){if(!this.c)return;const n=this.c.currentTime;this.f.type='lowpass';this.f.frequency.setTargetAtTime(20000,n,.04);this.f.Q.setTargetAtTime(.2,n,.04);this.wet.gain.setTargetAtTime(0,n,.04);this.fb.gain.setTargetAtTime(.24,n,.04);this.del.delayTime.setTargetAtTime(.24,n,.04);this.sh.curve=this.curve(2+state.pressure/100*8)}
  async load(l,f){await this.init();const ab=await f.arrayBuffer();this.custom=this.custom||{};this.custom[l]=await this.c.decodeAudioData(ab.slice(0))}
 }
 const A=new Audio();
@@ -271,6 +307,9 @@ function pad(e){const r=$('#xy').getBoundingClientRect(),x=clamp((e.clientX-r.le
   const lens=[2,3,4,6,8,12],len=lens[Math.floor(x*6)];
   const feel=y<.22?'LOOP':y<.46?'REV':y<.66?'ROT':y<.80?'HOLES':'FRACTURE';
   $('#readout').textContent=len+' STEP • '+feel+' • '+Math.round(y*100)+'%';
+}else if(state.mode==='FX'){
+  const names=['ACID','DUB','METAL','CRUSH'];
+  $('#readout').textContent=names[Math.min(3,Math.floor(x*4))]+' • '+Math.round(y*100)+'%';
 }else{
   $('#readout').textContent=divs[Math.floor(x*6)]+' • '+Math.round(y*100)+'%';
 }
@@ -391,6 +430,11 @@ xy.onpointerup=xy.onpointercancel=()=>{
   if(!state.hold){A.release();$('#cursor').style.display='none'}
   if(state.rec){state.rec=false;$('#rec').classList.remove('active')}
 };
+if(!window.PointerEvent){
+  xy.onmousedown=e=>{state.pad=true;state.repeatNext=0;if(state.mode==='PHRASE'){state.phraseStart=state.step;state.phraseBase=clone(state.pattern)};audioOK().then(ok=>{if(ok&&state.pad)pad(e)})};
+  xy.onmousemove=e=>{if(state.pad)pad(e)};
+  window.addEventListener('mouseup',()=>{if(!state.pad)return;state.pad=false;if(state.mode==='CHOP'&&state.base&&!state.hold){state.pattern=state.base;state.base=null;render()}if(state.mode==='PHRASE'&&state.phraseBase&&!state.hold){state.pattern=state.phraseBase;state.phraseBase=null;render()}if(!state.hold){A.release();$('#cursor').style.display='none'}});
+}
 $('#rec').onclick=()=>{state.rec=!state.rec;$('#rec').classList.toggle('active',state.rec)};function gest(rev=false,speed=1){if(!state.gesture.length)return;let g=rev?[...state.gesture].reverse().map(p=>({...p,t:1-p.t})).sort((a,b)=>a.t-b.t):state.gesture,dur=60/state.bpm*4*1000/speed,start=performance.now();function tick(){const u=(performance.now()-start)/dur;if(u>=1){state.pad=false;if(!state.hold){A.release();$('#cursor').style.display='none'}return}let p=g[0];for(const q of g){if(q.t<=u)p=q;else break}const r=xy.getBoundingClientRect();state.pad=true;pad({clientX:r.left+p.x*r.width,clientY:r.top+(1-p.y)*r.height});requestAnimationFrame(tick)}tick()}
 $('#gplay').onclick=()=>gest(false,1);$('#grev').onclick=()=>gest(true,1);$('#g2').onclick=()=>gest(false,2);
 $('[data-p]').forEach(b=>{
