@@ -7,7 +7,7 @@
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icon.svg">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>ARSIDER RIDDIM v4.1</title>
+<title>ARSIDER RIDDIM v4.2</title>
 <style>
 :root{--bg:#090a0d;--p:#11141a;--p2:#171b24;--t:#f5f7fa;--m:#8b93a3;--a:#d9ff48;--b:#61d9ff;--r:14px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;background:var(--bg);color:var(--t);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
@@ -56,6 +56,7 @@ button{padding:8px 10px}button:active,.active{border-color:var(--a);box-shadow:0
 <div class="modeRow">
 <button class="mode active" data-mode="REPEAT">REPEAT</button>
 <button class="mode" data-mode="CHOP">CHOP</button>
+<button class="mode" data-mode="PHRASE">PHRASE</button>
 <button class="mode" data-mode="FX">FX</button>
 <button class="mode" data-mode="S&H">S&H</button>
 <button id="hold">HOLD</button>
@@ -93,7 +94,7 @@ button{padding:8px 10px}button:active,.active{border-color:var(--a);box-shadow:0
 <button data-p="DROP">DROP</button><button data-p="RUSH">RUSH</button><button data-p="TURN">TURN</button><button id="kill" class="danger">KILL</button>
 </section>
 
-<section class="panel hint"><label style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><input id="coupled" type="checkbox"> COUPLED EVENTS</label>Tap sul nome FACTORY di una voce per caricare un sample tuo. Il pad XY è momentary. REPEAT ripete, CHOP spezza blocchi, S&H crea modulazioni a gradini. REPEAT TARGET decide quale voce massacrare.</section>
+<section class="panel hint"><label style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><input id="coupled" type="checkbox"> COUPLED EVENTS</label>Tap sul nome FACTORY di una voce per caricare un sample tuo. Il pad XY è momentary. REPEAT ripete colpi, CHOP spezza blocchi, PHRASE cattura pezzi del riddim in corsa e li ricicla/reversa/ruota/frattura, S&H crea modulazioni a gradini. REPEAT TARGET decide quale voce massacrare.</section>
 </div>
 
 <div id="linkModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:99;padding:14px;overflow:auto">
@@ -121,7 +122,7 @@ button{padding:8px 10px}button:active,.active{border-color:var(--a);box-shadow:0
 (()=>{'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const lanes=['KICK','SNARE','HAT','PERC'], divs=['1/2','1/4','1/8','1/16','1/32','1/64'];
-const state={bpm:160,playing:false,step:0,next:0,timer:null,family:'DUB',pressure:72,interlock:30,mode:'REPEAT',hold:false,pad:false,x:.5,y:0,pattern:null,base:null,temp:0,repeatLane:'KICK',repeatNext:0,gesture:[],rec:false,recStart:0,graf:null,void:false,drop:0,repeatTarget:'ALL',loopSize:0,loopBase:null,shCounter:0,shValue:0,coupled:false,peer:null,channel:null,role:null,connected:false};
+const state={bpm:160,playing:false,step:0,next:0,timer:null,family:'DUB',pressure:72,interlock:30,mode:'REPEAT',hold:false,pad:false,x:.5,y:0,pattern:null,base:null,temp:0,repeatLane:'KICK',repeatNext:0,gesture:[],rec:false,recStart:0,graf:null,void:false,drop:0,repeatTarget:'ALL',loopSize:0,loopBase:null,shCounter:0,shValue:0,phraseBase:null,phraseStart:0,phraseLen:4,coupled:false,peer:null,channel:null,role:null,connected:false};
 function blank(){return Object.fromEntries(lanes.map(l=>[l,Array(16).fill(false)]))}
 function euc(n,p,r=0){return Array.from({length:n},(_,i)=>((((i-r+n)%n)*p)%n)<p)}
 function clone(p){return Object.fromEntries(lanes.map(l=>[l,[...p[l]]]))}
@@ -194,6 +195,54 @@ function chopLive(){
   });
   state.pattern=p;render();
 }
+function phraseLive(){
+  if(!state.phraseBase)state.phraseBase=clone(state.pattern);
+  const lens=[2,3,4,6,8,12];
+  const len=lens[Math.floor(state.x*6)];
+  state.phraseLen=len;
+  const src=state.phraseBase, start=state.phraseStart%16, p=blank(), y=state.y;
+
+  lanes.forEach(l=>{
+    const phrase=[];
+    for(let j=0;j<len;j++)phrase.push(src[l][(start+j)%16]);
+
+    for(let i=0;i<16;i++){
+      const cycle=Math.floor(i/len);
+      let j=i%len;
+
+      // exact repetition at the bottom, progressively stranger higher up
+      if(y>.22 && cycle%2===1) j=len-1-j;                    // alternate reverse
+      if(y>.46 && len>2) j=(j+cycle)%len;                   // rotating phrase
+      let v=phrase[j];
+
+      if(y>.66 && (l==='HAT'||l==='PERC')){                 // holes in peripherals
+        const gate=((i*3 + cycle*5 + (l==='PERC'?2:0))%7);
+        if(gate < Math.floor((y-.62)*8)) v=false;
+      }
+      if(y>.80 && l==='HAT'){                               // cross-rhythm fracture
+        const q=(j+2+cycle)%len;
+        v = v || phrase[q];
+      }
+      if(y>.90 && l==='PERC'){
+        const q=(len-1-j+cycle)%len;
+        v = phrase[q];
+      }
+
+      p[l][i]=v;
+    }
+  });
+
+  // core protection: keep at least one low-frequency anchor per bar
+  if(!p.KICK.some(Boolean)){
+    const k=src.KICK.findIndex(Boolean);
+    p.KICK[k>=0?k:0]=true;
+  }
+  if(!p.SNARE.some(Boolean)){
+    const q=src.SNARE.findIndex(Boolean);
+    if(q>=0)p.SNARE[q]=true;
+  }
+  state.pattern=p;render();
+}
 function sched(){if(!state.playing)return;while(state.next<A.c.currentTime+.1){const i=state.step,t=state.next;if(i===0){if(state.temp>0&&--state.temp===0&&state.base){state.pattern=state.base;state.base=null;render()}if(state.drop>0)state.drop--}
  if(!state.void&&state.drop===0)lanes.forEach(l=>{if(state.pattern[l][i]){A.hit(l,t,l==='KICK'||l==='SNARE'?1:.88);state.repeatLane=l}});
  if(state.pad&&state.mode==='REPEAT'){
@@ -218,7 +267,19 @@ function sched(){if(!state.playing)return;while(state.next<A.c.currentTime+.1){c
  setTimeout(()=>paint(i),Math.max(0,(t-A.c.currentTime)*1000-5));state.next+=60/state.bpm/4;state.step=(state.step+1)%16}}
 async function play(){if(!(await audioOK()))return;if(state.playing){state.playing=false;clearInterval(state.timer);$('#play').textContent='PLAY';paint(-1);A.release()}else{state.playing=true;state.step=0;state.next=A.c.currentTime+.08;$('#play').textContent='STOP';state.timer=setInterval(sched,25)}}
 function perf(a){if(a==='VOID'){state.void=true;return}if(a==='DROP'){state.drop=1;return}state.base=clone(state.pattern);let p=clone(state.pattern);if(a==='BREAK'){p.HAT=euc(16,11,1);p.PERC=euc(16,9,4)}if(a==='AMEN'){p.KICK=[1,0,0,1,0,0,1,0,1,0,1,0,0,1,0,1].map(Boolean);p.SNARE=[0,0,0,0,1,0,0,1,0,0,0,0,1,0,1,0].map(Boolean);p.HAT=euc(16,12)}if(a==='CHOP')lanes.forEach(l=>p[l]=[...p[l].slice(12),...p[l].slice(0,4),...p[l].slice(8,12),...p[l].slice(4,8)]);if(a==='TURN')lanes.forEach(l=>p[l]=[...p[l]].reverse());if(a==='RUSH'){p.HAT=Array(16).fill(true);p.PERC=euc(16,11,1)}state.pattern=p;state.temp=1;render()}
-function pad(e){const r=$('#xy').getBoundingClientRect(),x=clamp((e.clientX-r.left)/r.width,0,.999),y=clamp(1-(e.clientY-r.top)/r.height,0,1);state.x=x;state.y=y;$('#cursor').style.display='block';$('#cursor').style.left=x*100+'%';$('#cursor').style.top=(1-y)*100+'%';$('#readout').textContent=divs[Math.floor(x*6)]+' • '+Math.round(y*100)+'%';if(state.mode==='FX')A.fx(y,'FX',x);else if(state.mode==='CHOP')chopLive();else if(state.mode==='S&H'){/* scheduler holds stepped values */}else A.fx(y,'REPEAT',x);if(state.rec){const dur=60/state.bpm*4*1000;state.gesture.push({t:clamp((performance.now()-state.recStart)/dur,0,1),x,y})}}
+function pad(e){const r=$('#xy').getBoundingClientRect(),x=clamp((e.clientX-r.left)/r.width,0,.999),y=clamp(1-(e.clientY-r.top)/r.height,0,1);state.x=x;state.y=y;$('#cursor').style.display='block';$('#cursor').style.left=x*100+'%';$('#cursor').style.top=(1-y)*100+'%';if(state.mode==='PHRASE'){
+  const lens=[2,3,4,6,8,12],len=lens[Math.floor(x*6)];
+  const feel=y<.22?'LOOP':y<.46?'REV':y<.66?'ROT':y<.80?'HOLES':'FRACTURE';
+  $('#readout').textContent=len+' STEP • '+feel+' • '+Math.round(y*100)+'%';
+}else{
+  $('#readout').textContent=divs[Math.floor(x*6)]+' • '+Math.round(y*100)+'%';
+}
+if(state.mode==='FX')A.fx(y,'FX',x);
+else if(state.mode==='CHOP')chopLive();
+else if(state.mode==='PHRASE')phraseLive();
+else if(state.mode==='S&H'){/* scheduler holds stepped values */}
+else A.fx(y,'REPEAT',x);
+if(state.rec){const dur=60/state.bpm*4*1000;state.gesture.push({t:clamp((performance.now()-state.recStart)/dur,0,1),x,y})}}
 
 async function waitIce(pc){
   if(pc.iceGatheringState==='complete')return;
@@ -293,9 +354,17 @@ $('#bpm').onchange=e=>{state.bpm=clamp(+e.target.value,50,240);if(state.connecte
 $('#pressure').oninput=e=>{state.pressure=+e.target.value;$('#pv').textContent=state.pressure;A.press(state.pressure/100)};$('#interlock').oninput=e=>{state.interlock=+e.target.value;$('#iv').textContent=state.interlock};
 $('.mode').forEach(b=>b.onclick=()=>{
   if(state.base&&state.mode==='CHOP'){state.pattern=state.base;state.base=null;render()}
+  if(state.phraseBase&&state.mode==='PHRASE'){state.pattern=state.phraseBase;state.phraseBase=null;render()}
   $('.mode').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.mode=b.dataset.mode;$('#padMode').textContent=state.mode;
 });
-$('#hold').onclick=()=>{state.hold=!state.hold;$('#hold').classList.toggle('active',state.hold)};
+$('#hold').onclick=()=>{
+  state.hold=!state.hold;$('#hold').classList.toggle('active',state.hold);
+  if(!state.hold){
+    if(state.mode==='PHRASE'&&state.phraseBase){state.pattern=state.phraseBase;state.phraseBase=null;render()}
+    if(state.mode==='CHOP'&&state.base){state.pattern=state.base;state.base=null;render()}
+    if(!state.pad)A.release();
+  }
+};
 $('.target').forEach(b=>b.onclick=()=>{
   $('.target').forEach(x=>x.classList.remove('activeTarget'));
   b.classList.add('activeTarget');state.repeatTarget=b.dataset.target;
@@ -306,6 +375,10 @@ const xy=$('#xy');xy.addEventListener('touchmove',e=>e.preventDefault(),{passive
 xy.onpointerdown=e=>{
   try{xy.setPointerCapture(e.pointerId)}catch(_){}
   state.pad=true;state.repeatNext=0;
+  if(state.mode==='PHRASE'){
+    state.phraseStart=state.step;
+    state.phraseBase=clone(state.pattern);
+  }
   if(state.rec){state.gesture=[];state.recStart=performance.now()}
   const px=e.clientX,py=e.clientY;
   audioOK().then(ok=>{if(ok&&state.pad)pad({clientX:px,clientY:py})});
@@ -314,6 +387,7 @@ xy.onpointermove=e=>{if(state.pad)pad(e)};
 xy.onpointerup=xy.onpointercancel=()=>{
   state.pad=false;
   if(state.mode==='CHOP'&&state.base&&!state.hold){state.pattern=state.base;state.base=null;render()}
+  if(state.mode==='PHRASE'&&state.phraseBase&&!state.hold){state.pattern=state.phraseBase;state.phraseBase=null;render()}
   if(!state.hold){A.release();$('#cursor').style.display='none'}
   if(state.rec){state.rec=false;$('#rec').classList.remove('active')}
 };
@@ -325,7 +399,7 @@ $('[data-p]').forEach(b=>{
     b.onpointerup=b.onpointercancel=()=>state.void=false;
   }else b.onclick=()=>{perf(b.dataset.p);if(state.coupled&&state.connected)sendNet({type:'perf',action:b.dataset.p})}
 });
-$('#kill').onclick=()=>{state.playing=false;clearInterval(state.timer);$('#play').textContent='PLAY';state.void=false;state.drop=0;A.release();paint(-1)};
+$('#kill').onclick=()=>{state.playing=false;clearInterval(state.timer);$('#play').textContent='PLAY';state.void=false;state.drop=0;state.phraseBase=null;state.base=null;A.release();paint(-1)};
 $('#coupled').onchange=e=>state.coupled=e.target.checked;
 $('#linkBtn').onclick=()=>$('#linkModal').style.display='block';
 $('#closeLink').onclick=()=>$('#linkModal').style.display='none';
