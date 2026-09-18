@@ -1,4 +1,4 @@
-const C='arsider-riddim-v42';
+const C='arsider-riddim-v421';
 const A=['./','./index.html','./manifest.webmanifest','./icon.svg'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(A)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==C&&k.startsWith('arsider-riddim')).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
