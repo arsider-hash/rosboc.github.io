@@ -1,1 +1,1 @@
-{"name":"ARSIDER RIDDIM","short_name":"ARSIDER","start_url":"./?v=4","display":"standalone","background_color":"#ffffff","theme_color":"#090a0d","orientation":"portrait-primary","icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}
+{"name":"ARSIDER RIDDIM","short_name":"ARSIDER","start_url":"./?v=5","scope":"./","display":"standalone","background_color":"#ffffff","theme_color":"#090a0d","orientation":"portrait-primary","icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}
