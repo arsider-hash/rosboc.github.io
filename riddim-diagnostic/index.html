@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>ARSIDER DIAGNOSTIC</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#0a0a0a;color:#fff;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:720px;margin:auto;padding:14px}
+h1{font-size:22px;margin:0 0 10px}
+small{color:#aaa}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+button{min-height:88px;border:1px solid #444;border-radius:14px;background:#171717;color:#fff;font-size:22px;font-weight:900;touch-action:manipulation}
+button.ok{background:#d9ff48;color:#000}
+#xy{height:260px;border:2px solid #666;border-radius:16px;position:relative;touch-action:none;background:linear-gradient(#181818,#050505);overflow:hidden}
+#dot{width:44px;height:44px;border:3px solid #d9ff48;border-radius:50%;position:absolute;transform:translate(-50%,-50%);display:none}
+#log{white-space:pre-wrap;background:#111;border:1px solid #333;border-radius:12px;padding:10px;min-height:180px;font:13px/1.4 ui-monospace,monospace;color:#9ff}
+.row{display:flex;gap:8px;margin:10px 0}
+.row button{flex:1;min-height:58px;font-size:16px}
+</style>
+</head>
+<body>
+<main>
+<h1>ARSIDER DIAGNOSTIC <small>v1</small></h1>
+<div class="grid">
+<button id="tap">1 TAP</button>
+<button id="audio">2 AUDIO</button>
+<button id="buttons">3 BUTTONS</button>
+<button id="clear">CLEAR LOG</button>
+</div>
+<div id="xy"><div id="dot"></div></div>
+<div class="row"><button id="a">A</button><button id="b">B</button><button id="c">C</button></div>
+<div id="log">READY</div>
+</main>
+<script>
+(()=>{'use strict';
+const log=document.getElementById('log');
+const xy=document.getElementById('xy');
+const dot=document.getElementById('dot');
+const lines=[];
+function out(s){lines.unshift(new Date().toLocaleTimeString()+'  '+s);log.textContent=lines.slice(0,18).join('\n')}
+window.addEventListener('error',e=>out('JS ERROR: '+e.message));
+document.getElementById('clear').onclick=()=>{lines.length=0;log.textContent='CLEARED'};
+document.getElementById('tap').addEventListener('click',e=>{e.currentTarget.classList.toggle('ok');out('CLICK TAP')});
+document.getElementById('tap').addEventListener('pointerdown',e=>out('POINTERDOWN TAP '+e.pointerType));
+document.getElementById('tap').addEventListener('touchstart',e=>out('TOUCHSTART TAP'),{passive:true});
+
+let ctx=null;
+document.getElementById('audio').addEventListener('click',async e=>{
+ try{
+  ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();
+  if(ctx.state==='suspended')await ctx.resume();
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.frequency.value=90;g.gain.setValueAtTime(.18,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.25);
+  o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+.26);
+  e.currentTarget.classList.add('ok');out('AUDIO OK state='+ctx.state);
+ }catch(err){out('AUDIO FAIL '+err.message)}
+});
+
+document.getElementById('buttons').addEventListener('click',e=>{e.currentTarget.classList.toggle('ok');out('BUTTONS MASTER CLICK')});
+['a','b','c'].forEach(id=>{
+ const el=document.getElementById(id);
+ el.addEventListener('click',()=>out('CLICK '+id.toUpperCase()));
+ el.addEventListener('pointerdown',e=>out('POINTER '+id.toUpperCase()+' '+e.pointerType));
+ el.addEventListener('touchstart',()=>out('TOUCH '+id.toUpperCase()),{passive:true});
+});
+
+function pos(x,y,kind){
+ const r=xy.getBoundingClientRect();
+ const px=Math.max(0,Math.min(1,(x-r.left)/r.width));
+ const py=Math.max(0,Math.min(1,(y-r.top)/r.height));
+ dot.style.display='block';dot.style.left=(px*100)+'%';dot.style.top=(py*100)+'%';
+ out(kind+' XY x='+px.toFixed(2)+' y='+py.toFixed(2));
+}
+xy.addEventListener('pointerdown',e=>{try{xy.setPointerCapture(e.pointerId)}catch(_){};pos(e.clientX,e.clientY,'POINTERDOWN')});
+xy.addEventListener('pointermove',e=>{if(e.buttons||e.pointerType==='touch')pos(e.clientX,e.clientY,'POINTERMOVE')});
+xy.addEventListener('pointerup',e=>out('POINTERUP XY '+e.pointerType));
+xy.addEventListener('touchstart',e=>{const t=e.touches[0];if(t){e.preventDefault();pos(t.clientX,t.clientY,'TOUCHSTART')}},{passive:false});
+xy.addEventListener('touchmove',e=>{const t=e.touches[0];if(t){e.preventDefault();pos(t.clientX,t.clientY,'TOUCHMOVE')}},{passive:false});
+xy.addEventListener('touchend',e=>{e.preventDefault();out('TOUCHEND XY')},{passive:false});
+out('INIT OK');
+})();
+</script>
+</body>
+</html>
