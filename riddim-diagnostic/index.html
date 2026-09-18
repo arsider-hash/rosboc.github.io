@@ -22,7 +22,7 @@ button.ok{background:#d9ff48;color:#000}
 </head>
 <body>
 <main>
-<h1>ARSIDER DIAGNOSTIC <small>v1</small></h1>
+<h1>ARSIDER DIAGNOSTIC <small>v2</small></h1>
 <div class="grid">
 <button id="tap">1 TAP</button>
 <button id="audio">2 AUDIO</button>
@@ -52,8 +52,8 @@ document.getElementById('audio').addEventListener('click',async e=>{
   ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();
   if(ctx.state==='suspended')await ctx.resume();
   const o=ctx.createOscillator(),g=ctx.createGain();
-  o.frequency.value=90;g.gain.setValueAtTime(.18,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.25);
-  o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+.26);
+  o.frequency.value=880;g.gain.setValueAtTime(.55,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.55);
+  o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+.56);
   e.currentTarget.classList.add('ok');out('AUDIO OK state='+ctx.state);
  }catch(err){out('AUDIO FAIL '+err.message)}
 });
