@@ -7,7 +7,7 @@
 <link rel="icon" href="../riddim/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="../riddim/icon.svg">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>ARSIDER RIDDIM MOBILE v4.3</title>
+<title>ARSIDER RIDDIM MOBILE v4.3.1</title>
 <style>
 :root{--bg:#090a0d;--p:#11141a;--p2:#171b24;--t:#f5f7fa;--m:#8b93a3;--a:#d9ff48;--b:#61d9ff;--r:14px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;background:var(--bg);color:var(--t);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
@@ -31,7 +31,7 @@ button{padding:8px 10px;touch-action:manipulation;user-select:none;-webkit-user-
 </head>
 <body>
 <div id="app">
-<header><div class="brand">ARSIDER RIDDIM</div><div style="display:flex;gap:8px;align-items:center"><button id="linkBtn" style="min-height:30px;padding:4px 8px">LINK</button><div id="peerState" class="status">SOLO</div></div></header>
+<header><div class="brand">ARSIDER RIDDIM <span id="runtimeTag" style="font-size:9px;color:#61d9ff">4.3.1</span></div><div style="display:flex;gap:8px;align-items:center"><button id="linkBtn" style="min-height:30px;padding:4px 8px">LINK</button><div id="peerState" class="status">SOLO</div></div></header>
 
 <section class="panel top">
 <button id="play" class="primary">PLAY</button>
@@ -120,6 +120,10 @@ button{padding:8px 10px;touch-action:manipulation;user-select:none;-webkit-user-
 <input id="file" type="file" accept="audio/*" hidden>
 <script>
 (()=>{'use strict';
+window.addEventListener('error',e=>{
+  const el=document.getElementById('engine');
+  if(el){el.textContent='JS ERROR: '+(e.message||'UNKNOWN');el.className='err'}
+});
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const lanes=['KICK','SNARE','HAT','PERC'], divs=['1/2','1/4','1/8','1/16','1/32','1/64'];
 const state={bpm:160,playing:false,step:0,next:0,timer:null,family:'DUB',pressure:72,interlock:30,mode:'REPEAT',hold:false,pad:false,x:.5,y:0,pattern:null,base:null,temp:0,repeatLane:'KICK',repeatNext:0,gesture:[],rec:false,recStart:0,graf:null,void:false,drop:0,repeatTarget:'ALL',loopSize:0,loopBase:null,shCounter:0,shValue:0,phraseBase:null,phraseStart:0,phraseLen:4,coupled:false,peer:null,channel:null,role:null,connected:false};
@@ -391,10 +395,10 @@ $('#play').onclick=async()=>{
 };$('#generate').onclick=()=>{state.family=$('#family').value;state.pattern=pattern();render()};$('#mutate').onclick=()=>{for(const l of ['HAT','PERC'])for(let i=0;i<16;i++)if(Math.random()<.12)state.pattern[l][i]=!state.pattern[l][i];render()};
 $('#bpm').onchange=e=>{state.bpm=clamp(+e.target.value,50,240);if(state.connected&&state.role==='host')sendNet({type:'bpm',bpm:state.bpm})};$('#family').onchange=e=>state.family=e.target.value;
 $('#pressure').oninput=e=>{state.pressure=+e.target.value;$('#pv').textContent=state.pressure;A.press(state.pressure/100)};$('#interlock').oninput=e=>{state.interlock=+e.target.value;$('#iv').textContent=state.interlock};
-$('.mode').forEach(b=>b.onclick=()=>{
+$$('.mode').forEach(b=>b.onclick=()=>{
   if(state.base&&state.mode==='CHOP'){state.pattern=state.base;state.base=null;render()}
   if(state.phraseBase&&state.mode==='PHRASE'){state.pattern=state.phraseBase;state.phraseBase=null;render()}
-  $('.mode').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.mode=b.dataset.mode;$('#padMode').textContent=state.mode;
+  $$('.mode').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.mode=b.dataset.mode;$('#padMode').textContent=state.mode;
 });
 $('#hold').onclick=()=>{
   state.hold=!state.hold;$('#hold').classList.toggle('active',state.hold);
@@ -404,11 +408,11 @@ $('#hold').onclick=()=>{
     if(!state.pad)A.release();
   }
 };
-$('.target').forEach(b=>b.onclick=()=>{
-  $('.target').forEach(x=>x.classList.remove('activeTarget'));
+$$('.target').forEach(b=>b.onclick=()=>{
+  $$('.target').forEach(x=>x.classList.remove('activeTarget'));
   b.classList.add('activeTarget');state.repeatTarget=b.dataset.target;
 });
-$('[data-loop]').forEach(b=>b.onclick=()=>loopPattern(+b.dataset.loop));
+$$('[data-loop]').forEach(b=>b.onclick=()=>loopPattern(+b.dataset.loop));
 $('#loopOff').onclick=()=>loopPattern(0);
 const xy=$('#xy');
 function touchPoint(e){
@@ -464,7 +468,7 @@ if(!window.PointerEvent){
 }
 $('#rec').onclick=()=>{state.rec=!state.rec;$('#rec').classList.toggle('active',state.rec)};function gest(rev=false,speed=1){if(!state.gesture.length)return;let g=rev?[...state.gesture].reverse().map(p=>({...p,t:1-p.t})).sort((a,b)=>a.t-b.t):state.gesture,dur=60/state.bpm*4*1000/speed,start=performance.now();function tick(){const u=(performance.now()-start)/dur;if(u>=1){state.pad=false;if(!state.hold){A.release();$('#cursor').style.display='none'}return}let p=g[0];for(const q of g){if(q.t<=u)p=q;else break}const r=xy.getBoundingClientRect();state.pad=true;pad({clientX:r.left+p.x*r.width,clientY:r.top+(1-p.y)*r.height});requestAnimationFrame(tick)}tick()}
 $('#gplay').onclick=()=>gest(false,1);$('#grev').onclick=()=>gest(true,1);$('#g2').onclick=()=>gest(false,2);
-$('[data-p]').forEach(b=>{
+$$('[data-p]').forEach(b=>{
   if(b.dataset.p==='VOID'){
     b.onpointerdown=()=>{state.void=true;if(state.coupled&&state.connected)sendNet({type:'perf',action:'VOID'})};
     b.onpointerup=b.onpointercancel=()=>state.void=false;
@@ -485,7 +489,7 @@ $('#shareLink').onclick=async()=>{
 
 
 function touchTap(selector, fn){
-  $(selector).forEach(el=>{
+  $$(selector).forEach(el=>{
     el.addEventListener('touchend',e=>{
       e.preventDefault();
       e.stopPropagation();
@@ -496,11 +500,11 @@ function touchTap(selector, fn){
 touchTap('.mode',(b)=>{
   if(state.base&&state.mode==='CHOP'){state.pattern=state.base;state.base=null;render()}
   if(state.phraseBase&&state.mode==='PHRASE'){state.pattern=state.phraseBase;state.phraseBase=null;render()}
-  $('.mode').forEach(x=>x.classList.remove('active'));
+  $$('.mode').forEach(x=>x.classList.remove('active'));
   b.classList.add('active');state.mode=b.dataset.mode;$('#padMode').textContent=state.mode;
 });
 touchTap('.target',(b)=>{
-  $('.target').forEach(x=>x.classList.remove('activeTarget'));
+  $$('.target').forEach(x=>x.classList.remove('activeTarget'));
   b.classList.add('activeTarget');state.repeatTarget=b.dataset.target;
 });
 touchTap('[data-loop]',(b)=>loopPattern(+b.dataset.loop));
@@ -514,7 +518,7 @@ $('#hold').addEventListener('touchend',e=>{
     if(!state.pad)A.release();
   }
 },{passive:false});
-$('[data-p]').forEach(b=>{
+$$('[data-p]').forEach(b=>{
   if(b.dataset.p==='VOID'){
     b.addEventListener('touchstart',e=>{e.preventDefault();state.void=true;if(state.coupled&&state.connected)sendNet({type:'perf',action:'VOID'})},{passive:false});
     b.addEventListener('touchend',e=>{e.preventDefault();state.void=false},{passive:false});
